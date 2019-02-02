@@ -1,0 +1,114 @@
+package net.fosforito.partido.api;
+
+import net.fosforito.partido.model.group.Group;
+import net.fosforito.partido.model.group.GroupDTO;
+import net.fosforito.partido.model.group.GroupRepository;
+import net.fosforito.partido.model.group.GroupService;
+import net.fosforito.partido.model.report.Report;
+import net.fosforito.partido.model.user.User;
+import net.fosforito.partido.model.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
+import java.util.List;
+
+@RestController
+public class GroupsApi {
+
+  @Inject
+  private GroupRepository groupRepository;
+
+  @Inject
+  private UserRepository userRepository;
+
+  @Inject
+  private GroupService groupService;
+
+  // Groups
+
+  @GetMapping(
+      value = "/groups",
+      produces = MediaType.APPLICATION_JSON
+  )
+  public Page<Group> getGroups(Pageable pageable) {
+    return groupRepository.findAll(pageable);
+  }
+
+  @PostMapping(
+      value = "/groups",
+      produces = MediaType.APPLICATION_JSON,
+      consumes = MediaType.APPLICATION_JSON
+  )
+  //@PreAuthorize("hasRole('ADMIN')")
+  public Group createGroup(@RequestBody GroupDTO groupDTO) {
+    Group group = new Group();
+    group.setName(groupDTO.getName());
+    group.setStatus(groupDTO.getStatus());
+    group.setFounder(userRepository.findById(groupDTO.getFounder()).get());
+    return groupRepository.save(group);
+  }
+
+  @PutMapping(
+      value = "/groups/{groupId}",
+      produces = MediaType.APPLICATION_JSON,
+      consumes = MediaType.APPLICATION_JSON
+  )
+  @PreAuthorize("@permissionEvaluator.userCanUpdateGroup(principal, #groupId)")
+  public Group updateGroup(@PathVariable Long groupId, @RequestBody GroupDTO groupDTO) throws Exception {
+    return groupRepository.findById(groupId)
+        .map(group -> {
+          group.setName(groupDTO.getName());
+          group.setStatus(groupDTO.getStatus());
+          return groupRepository.save(group);
+        }).orElseThrow(() -> new Exception("Group not found with id " + groupId));
+  }
+
+  @GetMapping(
+      value = "/groups/{groupId}",
+      produces = MediaType.APPLICATION_JSON
+  )
+  public Group getGroup(@PathVariable Long groupId) {
+    return groupRepository.findById(groupId).get();
+  }
+
+  @DeleteMapping(value = "/groups/{groupId}")
+  public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) throws Exception {
+    return groupRepository.findById(groupId)
+        .map(group -> {
+          groupRepository.delete(group);
+          return ResponseEntity.ok().build();
+        }).orElseThrow(() -> new Exception("Group not found with id " + groupId));
+  }
+
+  @PostMapping(value = "/groups/{groupId}/users/{userId}", produces = MediaType.APPLICATION_JSON)
+  public Group addUserToGroup(@PathVariable Long groupId, @PathVariable Long userId) throws Exception {
+    return groupRepository.findById(groupId).map(group -> {
+      List<User> groupUsers = group.getUsers();
+      groupUsers.add(userRepository.findById(userId).get());
+      group.setUsers(groupUsers);
+      return groupRepository.save(group);
+    }).orElseThrow(() -> new Exception("Cannot add user with id " + userId + " to group with id " + groupId));
+  }
+
+  @DeleteMapping(value = "/groups/{groupId}/users/{userId}", produces = MediaType.APPLICATION_JSON)
+  public Group removeUserFromGroup(@PathVariable Long groupId, @PathVariable Long userId) throws Exception {
+    return groupRepository.findById(groupId).map(group -> {
+      List<User> groupUsers = group.getUsers();
+      groupUsers.remove(userRepository.findById(userId).get());
+      group.setUsers(groupUsers);
+      return groupRepository.save(group);
+    }).orElseThrow(() -> new Exception("Cannot remove user with id " + userId + " from group with id " + groupId));
+  }
+
+  @GetMapping(value = "/groups/{groupId}/report")
+  public Report getGroupReport(@PathVariable Long groupId) {
+    return groupService.createActualGroupReport(groupId);
+  }
+}

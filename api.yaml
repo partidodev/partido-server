@@ -1,0 +1,615 @@
+---
+swagger: "2.0"
+info:
+  description: "An API for keeping track of your bills and your friend with whom you\
+    \ share them."
+  version: "1.0.0"
+  title: "Partido API"
+  termsOfService: ""
+  contact:
+    name: "Jens Leon Wagner"
+    email: "fosforito280@gmail.com"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+security:
+- HTTP_BASIC: []
+paths:
+  /users/:
+    get:
+      tags:
+      - "Users"
+      summary: "Get a list of Users"
+      description: "Loads a list of Users"
+      parameters:
+      - name: "offset"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "offset = size * desired page"
+        x-example: 0
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "Size of the page to retrieve."
+        x-example: 10
+      - name: "sort"
+        in: "query"
+        required: false
+        type: "string"
+        description: "Order in which to retrieve the results. Multiple sort criteria\
+          \ can be passed."
+        x-example: "birthday DESC"
+      - name: "firstName"
+        in: "query"
+        required: false
+        type: "string"
+        description: "Allows to filter the collections of result by the value of field\
+          \ firstName"
+        x-example: "John"
+      - name: "lastName"
+        in: "query"
+        required: false
+        type: "string"
+        description: "Allows to filter the collections of result by the value of field\
+          \ lastName"
+        x-example: "Doe"
+      - name: "active"
+        in: "query"
+        required: false
+        type: "boolean"
+        description: "Allows to filter the collections of result by the value of field\
+          \ active"
+        x-example: true
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/User"
+          examples:
+            application/json: "[{\n  \"id\": \"0e8dd830-ad98-11e6-bf2e-47644ada7c0f\"\
+              ,\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"birthday\"\
+              : 152755200000,\n  \"active\": true,\n  \"rank\": 1,\n  \"company\"\
+              : \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\n}]"
+          headers:
+            X-Page-Count:
+              type: "integer"
+              x-example: 1
+            X-Page-Number:
+              type: "integer"
+              x-example: 1
+            X-Page-Size:
+              type: "integer"
+              x-example: 25
+            X-Total-Count:
+              type: "integer"
+              x-example: 2
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      tags:
+      - "Users"
+      summary: "Create an User"
+      description: "Adds an User"
+      consumes: []
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+        x-examples:
+          application/json: "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\"\
+            ,\n  \"birthday\": 152755200000,\n  \"active\": true,\n  \"rank\": 1,\n\
+            \  \"company\": \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\n}"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/User"
+          examples:
+            application/json: "{\n  \"id\": \"0e8dd830-ad98-11e6-bf2e-47644ada7c0f\"\
+              ,\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"birthday\"\
+              : 152755200000,\n  \"active\": true,\n  \"rank\": 1,\n  \"company\"\
+              : \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\n}"
+      security: []
+  /users/{userId}:
+    get:
+      tags:
+      - "Users"
+      summary: "Load an individual User"
+      description: "Loads an User"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/User"
+          examples:
+            application/json: "{\n  \"id\": \"0e8dd830-ad98-11e6-bf2e-47644ada7c0f\"\
+              ,\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"birthday\"\
+              : 152755200000,\n  \"active\": true,\n  \"rank\": 1,\n  \"company\"\
+              : \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\n}"
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      tags:
+      - "Users"
+      summary: "Update an User"
+      description: "Stores an User"
+      consumes: []
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+        x-examples:
+          application/json: "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\"\
+            ,\n  \"birthday\": 152755200000,\n  \"active\": true,\n  \"rank\": 1,\n\
+            \  \"company\": \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\n}"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/User"
+          examples:
+            application/json: "{\n  \"id\": \"0e8dd830-ad98-11e6-bf2e-47644ada7c0f\"\
+              ,\n  \"firstName\": \"John\",\n  \"lastName\": \"Smith\",\n  \"birthday\"\
+              : 152755200000,\n  \"active\": true,\n  \"rank\": 1,\n  \"company\"\
+              : \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\n}"
+    delete:
+      tags:
+      - "Users"
+      summary: "Delete an User"
+      description: "Deletes an User"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+    parameters:
+    - name: "userId"
+      in: "path"
+      required: true
+      type: "number"
+      description: "Identifier of the User"
+      x-example: 1.0
+  /groups/:
+    get:
+      tags:
+      - "Groups"
+      summary: "Load a list of Groups"
+      description: "Loads a list of Groups"
+      parameters:
+      - name: "offset"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "offset = size * desired page"
+        x-example: 0
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "Size of the page to retrieve."
+        x-example: 10
+      - name: "sort"
+        in: "query"
+        required: false
+        type: "string"
+        description: "Order in which to retrieve the results. Multiple sort criteria\
+          \ can be passed. Example: sort=age ASC,height DESC"
+        x-example: "name ASC"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Group"
+          examples:
+            application/json: "[{\n  \"id\": \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\
+              ,\n  \"name\": \"George Street Brewery\",\n  \"address\":{\n    \"street\"\
+              : \"2 place de la Defense\",\n    \"zipcode\": \"92053\",\n    \"city\"\
+              : \"Paris\"\n  },\n  \"tags\":[\n    \"brewery\",\n    \"beer\",\n \
+              \   \"ale\"\n  ]\n}]"
+          headers:
+            X-Page-Count:
+              type: "integer"
+              x-example: 1
+            X-Page-Number:
+              type: "integer"
+              x-example: 1
+            X-Page-Size:
+              type: "integer"
+              x-example: 25
+            X-Total-Count:
+              type: "integer"
+              x-example: 2
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      tags:
+      - "Groups"
+      summary: "Create a new Group"
+      description: "Adds a Group"
+      consumes: []
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Group"
+        x-examples:
+          application/json: "{\n  \"name\": \"George Street Brewery\",\n  \"address\"\
+            :{\n    \"street\": \"2 place de la Defense\",\n    \"zipcode\": \"92053\"\
+            ,\n    \"city\": \"Paris\"\n  },\n  \"tags\":[\n    \"brewery\",\n   \
+            \ \"beer\",\n    \"ale\"\n  ]\n}"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Group"
+          examples:
+            application/json: "{\n  \"id\": \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\
+              ,\n  \"name\": \"George Street Brewery\",\n  \"address\":{\n    \"street\"\
+              : \"2 place de la Defense\",\n    \"zipcode\": \"92053\",\n    \"city\"\
+              : \"Paris\"\n  },\n  \"tags\":[\n    \"brewery\",\n    \"beer\",\n \
+              \   \"ale\"\n  ]\n}"
+  /groups/{groupId}:
+    get:
+      tags:
+      - "Groups"
+      summary: "Load an individual Group"
+      description: "Loads a Group"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Group"
+          examples:
+            application/json: "{\n  \"id\": \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\
+              ,\n  \"name\": \"George Street Brewery\",\n  \"address\":{\n    \"street\"\
+              : \"2 place de la Defense\",\n    \"zipcode\": \"92053\",\n    \"city\"\
+              : \"Paris\"\n  },\n  \"tags\":[\n    \"brewery\",\n    \"beer\",\n \
+              \   \"ale\"\n  ]\n}"
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      tags:
+      - "Groups"
+      summary: "Update a Group"
+      description: "Stores a Group"
+      consumes: []
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Group"
+        x-examples:
+          application/json: "{\n  \"name\": \"George Street Brewery\",\n  \"address\"\
+            :{\n    \"street\": \"2 place de la Defense\",\n    \"zipcode\": \"92053\"\
+            ,\n    \"city\": \"Paris\"\n  },\n  \"tags\":[\n    \"brewery\",\n   \
+            \ \"beer\",\n    \"ale\"\n  ]\n}"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Group"
+          examples:
+            application/json: "{\n  \"id\": \"0e8cedd0-ad98-11e6-bf2e-47644ada7c0f\"\
+              ,\n  \"name\": \"George Street Brewery\",\n  \"address\":{\n    \"street\"\
+              : \"2 place de la Defense\",\n    \"zipcode\": \"92053\",\n    \"city\"\
+              : \"Paris\"\n  },\n  \"tags\":[\n    \"brewery\",\n    \"beer\",\n \
+              \   \"ale\"\n  ]\n}"
+    delete:
+      tags:
+      - "Groups"
+      summary: "Delete a Group"
+      description: "Deletes a Group"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+    parameters:
+    - name: "groupId"
+      in: "path"
+      required: true
+      type: "number"
+      description: "Identifier of the Group"
+      x-example: 1.0
+  /groups/{groupId}/bills:
+    get:
+      tags:
+      - "Bills"
+      summary: "Load a list of  Bills in a specific Group"
+      description: "Loads a list of Bills in a specific Group"
+      parameters:
+      - name: "offset"
+        in: "query"
+        required: false
+        type: "number"
+        description: "offset = size * desired page"
+        x-example: 0.0
+      - name: "size"
+        in: "query"
+        required: false
+        type: "integer"
+        description: "Size of the page to retrieve."
+        x-example: 10
+      - name: "sort"
+        in: "query"
+        required: false
+        type: "string"
+        description: "Order in which to retrieve the results. Multiple sort criteria\
+          \ can be passed. Example: sort=age ASC,height DESC"
+        x-example: "name ASC"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Bill"
+          headers:
+            X-Page-Count:
+              type: "integer"
+              x-example: 1
+            X-Page-Number:
+              type: "integer"
+              x-example: 1
+            X-Page-Size:
+              type: "integer"
+              x-example: 25
+            X-Total-Count:
+              type: "integer"
+              x-example: 2
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      tags:
+      - "Bills"
+      summary: "Create a new Bill in a specific Group"
+      description: "Adds a Bill in a specific Group"
+      consumes: []
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Bill"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Bill"
+    parameters:
+    - name: "groupId"
+      in: "path"
+      required: true
+      type: "number"
+      description: "Identifier of the Group"
+      x-example: 1.0
+  /groups/{groupId}/bills/{billId}:
+    get:
+      tags:
+      - "Bills"
+      summary: "Load an individual Bill in a specific Group"
+      description: "Loads a Bill in a specific Group"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Bill"
+        400:
+          description: "Status 400"
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      tags:
+      - "Bills"
+      summary: "Update a Bill in a specific Group"
+      description: "Stores a Bill in a specific Group"
+      consumes: []
+      parameters:
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Bill"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Bill"
+    delete:
+      tags:
+      - "Bills"
+      summary: "Delete a Bill in a specific Group"
+      description: "Deletes a Bill in a specific Group"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+    parameters:
+    - name: "groupId"
+      in: "path"
+      required: true
+      type: "number"
+      description: "Identifier of the Group"
+      x-example: 1.0
+    - name: "billId"
+      in: "path"
+      required: true
+      type: "number"
+      description: "Identifier of the Bill"
+      x-example: 1.0
+securityDefinitions:
+  HTTP_BASIC:
+    description: "All GET methods are public, meaning that *you can read all the data*.\
+      \ Write operations require authentication and therefore are forbidden to the\
+      \ general public."
+    type: "basic"
+definitions:
+  Error:
+    type: "object"
+    required:
+    - "code"
+    properties:
+      code:
+        type: "integer"
+        minimum: 400
+        maximum: 599
+      description:
+        type: "string"
+        example: "Bad query parameter [$size]: Invalid integer value [abc]"
+      reasonPhrase:
+        type: "string"
+        example: "Bad Request"
+    description: "This general error structure is used throughout this API."
+    example: "{\n  \"code\": 400,\n  \"description\": \"Bad query parameter [$size]:\
+      \ Invalid integer value [abc]\",\n  \"reasonPhrase\": \"Bad Request\"\n}"
+  User:
+    type: "object"
+    required:
+    - "email"
+    - "firstNames"
+    - "id"
+    - "lastNames"
+    - "password"
+    properties:
+      id:
+        type: "integer"
+        description: "Auto-generated primary key field"
+        example: 1
+      firstNames:
+        type: "string"
+        example: "Kurt"
+      lastNames:
+        type: "string"
+        example: "Williams"
+      email:
+        type: "string"
+        description: "Email address"
+      password:
+        type: "string"
+        description: "Hashed password"
+      birthday:
+        type: "string"
+        format: "date"
+        description: "Birthday as date"
+        example: "2019-01-01"
+      active:
+        type: "boolean"
+        default: true
+    description: "A representation of an User."
+    example: "{\n  \"id\": \"1\",\n  \"firstNames\": \"John\",\n  \"lastNames\": \"\
+      Smith\",\n  \"birthday\": 152755200000,\n  \"active\": true,\n  \"company\"\
+      : \"1\"\n}"
+  Group:
+    type: "object"
+    required:
+    - "founder"
+    - "id"
+    - "name"
+    properties:
+      id:
+        type: "integer"
+        description: "Auto-generated primary key field"
+      name:
+        type: "string"
+      status:
+        type: "string"
+        description: "A status line or tagline, describing the group"
+        example: "This is a tagline..."
+      image:
+        type: "string"
+        format: "binary"
+        description: "Group image"
+      founder:
+        type: "integer"
+        description: "User who founded the Group"
+        example: 1
+    description: "A representation of a Group."
+    example: "{\n  'id': '1'\n  'name': 'Group 123',\n  'status': 'This is a tagline...',\n\
+      \  'founder': '1'\n}"
+  Bill:
+    type: "object"
+    required:
+    - "amount"
+    - "creator"
+    - "creditor"
+    - "dateTime"
+    - "description"
+    - "group"
+    - "id"
+    properties:
+      id:
+        type: "integer"
+        description: "Auto-generated primary key field"
+      description:
+        type: "string"
+        description: "Description of the bill"
+      amount:
+        type: "number"
+        description: "Original amount of the bill"
+      dateTime:
+        type: "string"
+        format: "date-time"
+        description: "Billing date and time"
+      group:
+        type: "integer"
+        description: "Identifier of a Group where the bill belongs to"
+      creator:
+        type: "integer"
+        description: "Which user created the bill?"
+      creditor:
+        type: "integer"
+        description: "Which user has the role of the creditor or main bill payer?\
+          \ Can be different as the creator of a bill."
+      splits:
+        $ref: "#/definitions/Split"
+      attachments:
+        type: "array"
+        description: "Attachments like fotos, pdf documents, etc"
+        items:
+          type: "string"
+          format: "binary"
+  Split:
+    type: "object"
+    required:
+    - "amount"
+    - "debtor"
+    - "id"
+    properties:
+      id:
+        type: "integer"
+        description: "Auto-generated value"
+      debtor:
+        type: "integer"
+        description: "Identifier of an User"
+      amount:
+        type: "number"
+        description: "How much does the debtor owe? Negative values mean that he will\
+          \ recieve money and does not owe anything"
+    description: "A Split defines how much a debtor owes to a creditor. The Amount\
+      \ can be negative, in this case the debtor is not really a \"debtor\" because\
+      \ he will recieve money. But for naming conventions the creditor is always the\
+      \ \"base\" of a bill and the debtors give or recieve money from or to this owner."

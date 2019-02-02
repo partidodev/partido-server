@@ -10,8 +10,6 @@ import net.fosforito.partido.model.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -60,7 +58,7 @@ public class GroupsApi {
       produces = MediaType.APPLICATION_JSON,
       consumes = MediaType.APPLICATION_JSON
   )
-  @PreAuthorize("@permissionEvaluator.userCanUpdateGroup(principal, #groupId)")
+  @PreAuthorize("@securityService.userCanUpdateGroup(principal, #groupId)")
   public Group updateGroup(@PathVariable Long groupId, @RequestBody GroupDTO groupDTO) throws Exception {
     return groupRepository.findById(groupId)
         .map(group -> {

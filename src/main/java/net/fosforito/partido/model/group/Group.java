@@ -1,5 +1,6 @@
 package net.fosforito.partido.model.group;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import net.fosforito.partido.model.user.User;
 
 import java.util.ArrayList;
@@ -33,8 +34,9 @@ public class Group {
           CascadeType.MERGE
       })
   @JoinTable(name = "groups_users",
-      joinColumns = {@JoinColumn(name = "group_id")},
-      inverseJoinColumns = {@JoinColumn(name = "user_id")})
+      joinColumns = { @JoinColumn(name = "group_id") },
+      inverseJoinColumns = { @JoinColumn(name = "user_id") })
+  @JsonIgnoreProperties({ "email", "birthday" })
   private List<User> users = new ArrayList<>();
 
   public Group() {

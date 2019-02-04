@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,6 +36,7 @@ public class GroupsApi {
       value = "/groups",
       produces = MediaType.APPLICATION_JSON
   )
+  @PreAuthorize("hasRole('ADMIN')")
   public Page<Group> getGroups(Pageable pageable) {
     return groupRepository.findAll(pageable);
   }
@@ -44,12 +46,15 @@ public class GroupsApi {
       produces = MediaType.APPLICATION_JSON,
       consumes = MediaType.APPLICATION_JSON
   )
-  //@PreAuthorize("hasRole('ADMIN')")
   public Group createGroup(@RequestBody GroupDTO groupDTO) {
+    User founder = userRepository.findById(groupDTO.getFounder()).get();
+    List<User> userList = new ArrayList<>();
+    userList.add(founder);
     Group group = new Group();
     group.setName(groupDTO.getName());
     group.setStatus(groupDTO.getStatus());
-    group.setFounder(userRepository.findById(groupDTO.getFounder()).get());
+    group.setFounder(founder);
+    group.setUsers(userList);
     return groupRepository.save(group);
   }
 
@@ -72,12 +77,15 @@ public class GroupsApi {
       value = "/groups/{groupId}",
       produces = MediaType.APPLICATION_JSON
   )
+  @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public Group getGroup(@PathVariable Long groupId) {
     return groupRepository.findById(groupId).get();
   }
 
   @DeleteMapping(value = "/groups/{groupId}")
+  @PreAuthorize("@securityService.userIsFounderOfGroup(principal, #groupId)")
   public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) throws Exception {
+    //TODO: make sure to delete all bills and user-group relations but no user accounts
     return groupRepository.findById(groupId)
         .map(group -> {
           groupRepository.delete(group);
@@ -86,7 +94,9 @@ public class GroupsApi {
   }
 
   @PostMapping(value = "/groups/{groupId}/users/{userId}", produces = MediaType.APPLICATION_JSON)
+  @PreAuthorize("@securityService.userCanUpdateGroup(principal, #groupId)")
   public Group addUserToGroup(@PathVariable Long groupId, @PathVariable Long userId) throws Exception {
+    //TODO: check if user already exists in group
     return groupRepository.findById(groupId).map(group -> {
       List<User> groupUsers = group.getUsers();
       groupUsers.add(userRepository.findById(userId).get());
@@ -96,6 +106,8 @@ public class GroupsApi {
   }
 
   @DeleteMapping(value = "/groups/{groupId}/users/{userId}", produces = MediaType.APPLICATION_JSON)
+  @PreAuthorize("@securityService.userIsSameUserAndFromGroup(principal, #userId, #groupId) " +
+      "AND @securityService.userIsNotFounderOfGroup(#userId, #groupId)")
   public Group removeUserFromGroup(@PathVariable Long groupId, @PathVariable Long userId) throws Exception {
     return groupRepository.findById(groupId).map(group -> {
       List<User> groupUsers = group.getUsers();
@@ -106,6 +118,7 @@ public class GroupsApi {
   }
 
   @GetMapping(value = "/groups/{groupId}/report")
+  @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public Report getGroupReport(@PathVariable Long groupId) {
     return groupService.createActualGroupReport(groupId);
   }

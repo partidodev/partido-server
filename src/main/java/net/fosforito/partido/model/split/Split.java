@@ -2,6 +2,9 @@ package net.fosforito.partido.model.split;
 
 import java.math.BigDecimal;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import net.fosforito.partido.model.user.User;
 
 import javax.persistence.*;
@@ -22,6 +25,8 @@ public class Split {
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "debtor_user_id")
+  @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
+  @JsonIdentityReference(alwaysAsId=true)
   private User debtor;
 
   @NotNull

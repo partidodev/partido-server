@@ -7,6 +7,8 @@ import net.fosforito.partido.model.group.GroupRepository;
 import net.fosforito.partido.model.split.Split;
 import net.fosforito.partido.model.split.SplitDTO;
 import net.fosforito.partido.model.user.UserRepository;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -28,11 +30,13 @@ public class BillsApi {
   private UserRepository userRepository;
 
   @GetMapping(value = "/groups/{groupId}/bills", produces = MediaType.APPLICATION_JSON)
-  public List<Bill> groupsGroupIdBillsGet(@PathVariable Long groupId) {
+  @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
+  public List<Bill> getAllBillsForGroup(@PathVariable Long groupId) {
     return billRepository.findAllByGroupId(groupId);
   }
 
   @PostMapping(value = "/bills", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
+  @PreAuthorize("@securityService.userCanReadGroup(principal, #billDTO.group)")
   public Bill createBillForGroup(@RequestBody BillDTO billDTO) {
     Bill bill = new Bill(
         billDTO.getDescription(),
@@ -47,17 +51,20 @@ public class BillsApi {
   }
 
   @PutMapping(value = "/bills/{billId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
-  public Response updateBill(@PathVariable Long billId, @RequestBody BillDTO bill) {
+  @PreAuthorize("@securityService.userCanReadGroup(principal, #billDTO.group)")
+  public Response updateBill(@PathVariable Long billId, @RequestBody BillDTO billDTO) {
     return Response.ok().entity("magic!").build();
     //TODO
   }
 
   @GetMapping(value = "/bills/{billId}", produces = MediaType.APPLICATION_JSON)
+  @PostAuthorize("@securityService.userCanReadGroup(principal, returnObject.group.id)")
   public Bill getBill(@PathVariable Long billId) {
     return billRepository.findById(billId).get();
   }
 
   @DeleteMapping(value = "/bills/{billId}")
+  @PreAuthorize("@securityService.userCanDeleteBill(principal, #billId)")
   public Response deleteBill(@PathVariable Long billId) {
     return Response.ok().entity("magic!").build();
     //TODO

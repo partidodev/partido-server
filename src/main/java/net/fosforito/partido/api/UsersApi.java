@@ -6,6 +6,7 @@ import net.fosforito.partido.model.user.UserRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,18 +23,21 @@ public class UsersApi {
   private PasswordEncoder passwordEncoder;
 
   @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON)
+  @PreAuthorize("hasRole('ADMIN')")
   public Page<User> usersGet(Pageable pageable) {
     return userRepository.findAll(pageable);
   }
 
-  @PostMapping(value = {"/users", "/registration"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
+  @PostMapping(value = {"/users"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   public User usersPost(@RequestBody User user) {
     user.setPassword(passwordEncoder.encode(user.getPassword()));
     return userRepository.save(user);
   }
 
   @DeleteMapping(value = "/users/{userId}")
+  @PreAuthorize("@securityService.userIsSameUser(principal, #userId) OR hasRole('ADMIN')")
   public ResponseEntity<?> usersUserIdDelete(@PathVariable Long userId) throws Exception {
+    //TODO: what will be deleted? Or just anonymize data?
     return userRepository.findById(userId)
         .map(user -> {
           userRepository.delete(user);
@@ -41,12 +45,21 @@ public class UsersApi {
         }).orElseThrow(() -> new Exception("User not found with id " + userId));
   }
 
+  /**
+   * To see user details from a group member, the users shipped
+   * with the getGroup-Request should be used.
+   *
+   * @param userId ID of the user to be fetched
+   * @return User object
+   */
   @GetMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON)
+  @PreAuthorize("@securityService.userIsSameUser(principal, #userId) OR hasRole('ADMIN')")
   public User usersUserIdGet(@PathVariable Long userId) {
     return userRepository.findById(userId).get();
   }
 
   @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
+  @PreAuthorize("@securityService.userIsSameUser(principal, #userId) OR hasRole('ADMIN')")
   public User usersUserIdPut(@PathVariable Long userId, @RequestBody UserDTO userDTO) throws Exception {
     return userRepository.findById(userId)
         .map(user -> {

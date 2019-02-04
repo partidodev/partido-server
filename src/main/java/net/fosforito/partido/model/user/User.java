@@ -1,5 +1,6 @@
 package net.fosforito.partido.model.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fosforito.partido.model.role.Role;
 
 import java.time.LocalDate;
@@ -27,13 +28,16 @@ public class User {
   @NotNull
   private String email;
 
+  @JsonIgnore
   private String password;
 
   private LocalDate birthday;
 
+  @JsonIgnore
   private Boolean active;
 
   @ManyToMany
+  @JsonIgnore
   @JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
   private Set<Role> roles;
 

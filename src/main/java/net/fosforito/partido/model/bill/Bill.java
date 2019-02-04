@@ -5,7 +5,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import net.fosforito.partido.model.group.Group;
 import net.fosforito.partido.model.split.Split;
 import net.fosforito.partido.model.user.User;
@@ -39,10 +42,14 @@ public class Bill {
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "creator_user_id")
+  @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
+  @JsonIdentityReference(alwaysAsId=true)
   private User creator;
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "creditor_user_id")
+  @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
+  @JsonIdentityReference(alwaysAsId=true)
   private User creditor;
 
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

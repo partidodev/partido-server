@@ -31,7 +31,7 @@ public class SecurityService {
    * Determine if a user can view a given image.
    */
   public boolean userCanUpdateGroup(UserDetails userDetails, Long groupId) {
-    User user = userRepository.findByUsername(userDetails.getUsername());
+    User user = userRepository.findByEmail(userDetails.getUsername());
     Group group = groupRepository.findById(groupId).get();
     return userIsFounderOfGroup(user, group)
         || userListContainsUser(group.getUsers(), user);
@@ -42,7 +42,7 @@ public class SecurityService {
   }
 
   public boolean userIsFounderOfGroup(UserDetails userDetails, Long groupId) {
-    User user = userRepository.findByUsername(userDetails.getUsername());
+    User user = userRepository.findByEmail(userDetails.getUsername());
     Group group = groupRepository.findById(groupId).get();
     return userIsFounderOfGroup(user, group);
   }
@@ -58,19 +58,19 @@ public class SecurityService {
   }
 
   public boolean userIsSameUserAndFromGroup(UserDetails userDetails, Long userId, Long groupId) {
-    User user = userRepository.findByUsername(userDetails.getUsername());
+    User user = userRepository.findByEmail(userDetails.getUsername());
     Group group = groupRepository.findById(groupId).get();
     return (userListContainsUser(group.getUsers(), user) || userIsFounderOfGroup(user, group))
         && user.getId().equals(userId);
   }
 
   public boolean userIsSameUser(UserDetails userDetails, Long userId) {
-    User user = userRepository.findByUsername(userDetails.getUsername());
+    User user = userRepository.findByEmail(userDetails.getUsername());
     return user.getId().equals(userId);
   }
 
   public  boolean userCanDeleteBill(UserDetails userDetails, Long billId) {
-    User user = userRepository.findByUsername(userDetails.getUsername());
+    User user = userRepository.findByEmail(userDetails.getUsername());
     Bill bill = billRepository.findById(billId).get();
     return userIsFounderOfGroup(user, bill.getGroup())
         || bill.getCreator().getId().equals(user.getId());

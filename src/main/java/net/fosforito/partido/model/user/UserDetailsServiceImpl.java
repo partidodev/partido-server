@@ -21,9 +21,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-    User user = userRepository.findByUsername(username);
+    User user = userRepository.findByEmail(email);
 
     Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 
@@ -33,6 +33,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
       }
     }
 
-    return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), grantedAuthorities);
+    return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), grantedAuthorities);
   }
 }

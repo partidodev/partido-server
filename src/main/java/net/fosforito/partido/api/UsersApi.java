@@ -29,8 +29,14 @@ public class UsersApi {
   }
 
   @PostMapping(value = {"/users"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
-  public User usersPost(@RequestBody User user) {
-    user.setPassword(passwordEncoder.encode(user.getPassword()));
+  public User usersPost(@RequestBody UserDTO userDTO) {
+    User user = new User();
+    user.setFirstNames(userDTO.getFirstNames());
+    user.setLastNames(userDTO.getLastNames());
+    user.setEmail(userDTO.getEmail());
+    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+    user.setBirthday(userDTO.getBirthday());
+    user.setActive(true); //TODO: verify Email
     return userRepository.save(user);
   }
 

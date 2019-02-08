@@ -30,14 +30,30 @@ public class Split {
   private User debtor;
 
   @NotNull
-  private BigDecimal amount;
+  private BigDecimal paid;
+
+  @NotNull
+  private BigDecimal borrows;
+
+  @NotNull
+  private int partsOfBill;
+
+  @NotNull
+  private boolean main;
 
   public Split() {
   }
 
-  public Split(User debtor, @NotNull BigDecimal amount) {
+  public Split(User debtor,
+               @NotNull BigDecimal paid,
+               @NotNull BigDecimal borrows,
+               @NotNull int partsOfBill,
+               @NotNull boolean main) {
     this.debtor = debtor;
-    this.amount = amount;
+    this.paid = paid;
+    this.borrows = borrows;
+    this.partsOfBill = partsOfBill;
+    this.main = main;
   }
 
   public Long getId() {
@@ -56,12 +72,36 @@ public class Split {
     this.debtor = debtor;
   }
 
-  public BigDecimal getAmount() {
-    return amount;
+  public BigDecimal getPaid() {
+    return paid;
   }
 
-  public void setAmount(BigDecimal amount) {
-    this.amount = amount;
+  public void setPaid(BigDecimal paid) {
+    this.paid = paid;
+  }
+
+  public BigDecimal getBorrows() {
+    return borrows;
+  }
+
+  public void setBorrows(BigDecimal borrows) {
+    this.borrows = borrows;
+  }
+
+  public int getPartsOfBill() {
+    return partsOfBill;
+  }
+
+  public void setPartsOfBill(int partsOfBill) {
+    this.partsOfBill = partsOfBill;
+  }
+
+  public boolean isMain() {
+    return main;
+  }
+
+  public void setMain(boolean main) {
+    this.main = main;
   }
 }
 

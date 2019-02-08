@@ -29,10 +29,13 @@ public class Bill {
   private String description;
 
   @NotNull
-  private BigDecimal amount;
+  private BigDecimal totalAmount;
 
   @NotNull
   private Date dateTime;
+
+  @NotNull
+  private int parts;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "group_id", nullable = false)
@@ -46,27 +49,30 @@ public class Bill {
   @JsonIdentityReference(alwaysAsId=true)
   private User creator;
 
-  @OneToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "creditor_user_id")
-  @JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="id")
-  @JsonIdentityReference(alwaysAsId=true)
-  private User creditor;
-
   @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
   @JoinColumn(name = "bill_id", nullable = false)
   private List<Split> splits = new ArrayList<>();
 
+  private boolean closed;
+
   public Bill() {
   }
 
-  public Bill(@NotNull String description, @NotNull BigDecimal amount, @NotNull Date dateTime, Group group, User creator, User creditor, List<Split> splits) {
+  public Bill(@NotNull String description,
+              @NotNull BigDecimal totalAmount,
+              @NotNull int parts,
+              @NotNull Date dateTime,
+              Group group,
+              User creator,
+              List<Split> splits) {
     this.description = description;
-    this.amount = amount;
+    this.totalAmount = totalAmount;
+    this.parts = parts;
     this.dateTime = dateTime;
     this.group = group;
     this.creator = creator;
-    this.creditor = creditor;
     this.splits = splits;
+    this.closed = false;
   }
 
   public Long getId() {
@@ -85,12 +91,20 @@ public class Bill {
     this.description = description;
   }
 
-  public BigDecimal getAmount() {
-    return amount;
+  public BigDecimal getTotalAmount() {
+    return totalAmount;
   }
 
-  public void setAmount(BigDecimal amount) {
-    this.amount = amount;
+  public void setTotalAmount(BigDecimal totalAmount) {
+    this.totalAmount = totalAmount;
+  }
+
+  public int getParts() {
+    return parts;
+  }
+
+  public void setParts(int parts) {
+    this.parts = parts;
   }
 
   public Date getDateTime() {
@@ -117,20 +131,20 @@ public class Bill {
     this.creator = creator;
   }
 
-  public User getCreditor() {
-    return creditor;
-  }
-
-  public void setCreditor(User creditor) {
-    this.creditor = creditor;
-  }
-
   public List<Split> getSplits() {
     return splits;
   }
 
   public void setSplits(List<Split> splits) {
     this.splits = splits;
+  }
+
+  public boolean isClosed() {
+    return closed;
+  }
+
+  public void setClosed(boolean closed) {
+    this.closed = closed;
   }
 }
 

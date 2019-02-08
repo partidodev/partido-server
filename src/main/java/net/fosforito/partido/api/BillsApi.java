@@ -40,11 +40,11 @@ public class BillsApi {
   public Bill createBillForGroup(@RequestBody BillDTO billDTO) {
     Bill bill = new Bill(
         billDTO.getDescription(),
-        billDTO.getAmount(),
+        billDTO.getTotalAmount(),
+        billDTO.getParts(),
         billDTO.getDateTime(),
         groupRepository.findById(billDTO.getGroup()).get(),
         userRepository.findById(billDTO.getCreator()).get(),
-        userRepository.findById(billDTO.getCreditor()).get(),
         convertToSplits(billDTO.getSplits())
     );
     return billRepository.save(bill);
@@ -73,7 +73,13 @@ public class BillsApi {
   private List<Split> convertToSplits(List<SplitDTO> splitDTOs) {
     List<Split> splits = new ArrayList<>();
     for (SplitDTO splitDTO : splitDTOs) {
-      splits.add(new Split(userRepository.findById(splitDTO.getDebtor()).get(), splitDTO.getAmount()));
+      splits.add(new Split(
+          userRepository.findById(splitDTO.getDebtor()).get(),
+          splitDTO.getPaid(),
+          splitDTO.getBorrows(),
+          splitDTO.getPartsOfBill(),
+          splitDTO.isMain()
+      ));
     }
     return splits;
   }

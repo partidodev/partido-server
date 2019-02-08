@@ -13,7 +13,7 @@ public class BillDTO {
   private String description;
 
   @NotNull
-  private BigDecimal amount;
+  private BigDecimal totalAmount;
 
   @NotNull
   private Date dateTime;
@@ -25,20 +25,26 @@ public class BillDTO {
   private Long creator;
 
   @NotNull
-  private Long creditor;
+  private int parts;
 
   private List<SplitDTO> splits;
 
   public BillDTO() {
   }
 
-  public BillDTO(@NotNull String description, @NotNull BigDecimal amount, @NotNull Date dateTime, @NotNull Long group, @NotNull Long creator, @NotNull Long creditor, List<SplitDTO> splits) {
+  public BillDTO(@NotNull String description,
+                 @NotNull BigDecimal totalAmount,
+                 @NotNull Date dateTime,
+                 @NotNull Long group,
+                 @NotNull Long creator,
+                 @NotNull int parts,
+                 List<SplitDTO> splits) {
     this.description = description;
-    this.amount = amount;
+    this.totalAmount = totalAmount;
     this.dateTime = dateTime;
     this.group = group;
     this.creator = creator;
-    this.creditor = creditor;
+    this.parts = parts;
     this.splits = splits;
   }
 
@@ -50,12 +56,12 @@ public class BillDTO {
     this.description = description;
   }
 
-  public BigDecimal getAmount() {
-    return amount;
+  public BigDecimal getTotalAmount() {
+    return totalAmount;
   }
 
-  public void setAmount(BigDecimal amount) {
-    this.amount = amount;
+  public void setTotalAmount(BigDecimal totalAmount) {
+    this.totalAmount = totalAmount;
   }
 
   public Date getDateTime() {
@@ -82,12 +88,12 @@ public class BillDTO {
     this.creator = creator;
   }
 
-  public Long getCreditor() {
-    return creditor;
+  public int getParts() {
+    return parts;
   }
 
-  public void setCreditor(Long creditor) {
-    this.creditor = creditor;
+  public void setParts(int parts) {
+    this.parts = parts;
   }
 
   public List<SplitDTO> getSplits() {

@@ -6,6 +6,7 @@ import net.fosforito.partido.model.bill.BillRepository;
 import net.fosforito.partido.model.group.GroupRepository;
 import net.fosforito.partido.model.split.Split;
 import net.fosforito.partido.model.split.SplitDTO;
+import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.UserRepository;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +30,9 @@ public class BillsApi {
   @Inject
   private UserRepository userRepository;
 
+  @Inject
+  private CurrentUserContext currentUserContext;
+
   @GetMapping(value = "/groups/{groupId}/bills", produces = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public List<Bill> getAllBillsForGroup(@PathVariable Long groupId) {
@@ -44,7 +48,7 @@ public class BillsApi {
         billDTO.getParts(),
         billDTO.getDateTime(),
         groupRepository.findById(billDTO.getGroup()).get(),
-        userRepository.findById(billDTO.getCreator()).get(),
+        currentUserContext.getCurrentUser(),
         convertToSplits(billDTO.getSplits())
     );
     return billRepository.save(bill);

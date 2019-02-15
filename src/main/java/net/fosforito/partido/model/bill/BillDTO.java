@@ -19,12 +19,6 @@ public class BillDTO {
   private Date dateTime;
 
   @NotNull
-  private Long group;
-
-  @NotNull
-  private Long creator;
-
-  @NotNull
   private int parts;
 
   private List<SplitDTO> splits;
@@ -35,15 +29,11 @@ public class BillDTO {
   public BillDTO(@NotNull String description,
                  @NotNull BigDecimal totalAmount,
                  @NotNull Date dateTime,
-                 @NotNull Long group,
-                 @NotNull Long creator,
                  @NotNull int parts,
                  List<SplitDTO> splits) {
     this.description = description;
     this.totalAmount = totalAmount;
     this.dateTime = dateTime;
-    this.group = group;
-    this.creator = creator;
     this.parts = parts;
     this.splits = splits;
   }
@@ -70,22 +60,6 @@ public class BillDTO {
 
   public void setDateTime(Date dateTime) {
     this.dateTime = dateTime;
-  }
-
-  public Long getGroup() {
-    return group;
-  }
-
-  public void setGroup(Long group) {
-    this.group = group;
-  }
-
-  public Long getCreator() {
-    return creator;
-  }
-
-  public void setCreator(Long creator) {
-    this.creator = creator;
   }
 
   public int getParts() {

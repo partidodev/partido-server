@@ -39,15 +39,15 @@ public class BillsApi {
     return billRepository.findAllByGroupId(groupId);
   }
 
-  @PostMapping(value = "/bills", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
-  @PreAuthorize("@securityService.userCanReadGroup(principal, #billDTO.group)")
-  public Bill createBillForGroup(@RequestBody BillDTO billDTO) {
+  @PostMapping(value = "/groups/{groupId}/bills", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
+  @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
+  public Bill createBillForGroup(@RequestBody BillDTO billDTO, @PathVariable Long groupId) {
     Bill bill = new Bill(
         billDTO.getDescription(),
         billDTO.getTotalAmount(),
         billDTO.getParts(),
         billDTO.getDateTime(),
-        groupRepository.findById(billDTO.getGroup()).get(),
+        groupRepository.findById(groupId).get(),
         currentUserContext.getCurrentUser(),
         convertToSplits(billDTO.getSplits())
     );

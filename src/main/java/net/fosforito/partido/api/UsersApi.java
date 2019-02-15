@@ -1,5 +1,6 @@
 package net.fosforito.partido.api;
 
+import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserDTO;
 import net.fosforito.partido.model.user.UserRepository;
@@ -18,18 +19,26 @@ public class UsersApi {
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
+  private final CurrentUserContext currentUserContext;
 
   @Inject
   public UsersApi(UserRepository userRepository,
-                  PasswordEncoder passwordEncoder) {
+                  PasswordEncoder passwordEncoder,
+                  CurrentUserContext currentUserContext) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
+    this.currentUserContext = currentUserContext;
   }
 
   @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON)
   @PreAuthorize("hasRole('ADMIN')")
   public Page<User> usersGet(Pageable pageable) {
     return userRepository.findAll(pageable);
+  }
+
+  @GetMapping(value = "/currentuser", produces = MediaType.APPLICATION_JSON)
+  public User getCurrentUser() {
+    return currentUserContext.getCurrentUser();
   }
 
   @PostMapping(value = {"/users"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)

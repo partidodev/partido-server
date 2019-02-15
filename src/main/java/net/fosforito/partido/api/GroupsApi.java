@@ -5,6 +5,7 @@ import net.fosforito.partido.model.group.GroupDTO;
 import net.fosforito.partido.model.group.GroupRepository;
 import net.fosforito.partido.model.group.GroupService;
 import net.fosforito.partido.model.report.Report;
+import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserRepository;
 import org.springframework.data.domain.Page;
@@ -24,14 +25,17 @@ public class GroupsApi {
   private final GroupRepository groupRepository;
   private final UserRepository userRepository;
   private final GroupService groupService;
+  private final CurrentUserContext currentUserContext;
 
   @Inject
   public GroupsApi(GroupRepository groupRepository,
                    UserRepository userRepository,
-                   GroupService groupService) {
+                   GroupService groupService,
+                   CurrentUserContext currentUserContext) {
     this.groupRepository = groupRepository;
     this.userRepository = userRepository;
     this.groupService = groupService;
+    this.currentUserContext = currentUserContext;
   }
 
   // Groups
@@ -45,13 +49,21 @@ public class GroupsApi {
     return groupRepository.findAll(pageable);
   }
 
+  @GetMapping(
+      value = "/currentusergroups",
+      produces = MediaType.APPLICATION_JSON
+  )
+  public List<Group> getCurrentUsersGroups() {
+    return groupRepository.findAllByUsersIsContaining(currentUserContext.getCurrentUser());
+  }
+
   @PostMapping(
       value = "/groups",
       produces = MediaType.APPLICATION_JSON,
       consumes = MediaType.APPLICATION_JSON
   )
   public Group createGroup(@RequestBody GroupDTO groupDTO) {
-    User founder = userRepository.findById(groupDTO.getFounder()).get();
+    User founder = currentUserContext.getCurrentUser();
     List<User> userList = new ArrayList<>();
     userList.add(founder);
     Group group = new Group();

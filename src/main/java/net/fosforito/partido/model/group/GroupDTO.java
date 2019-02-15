@@ -9,16 +9,12 @@ public class GroupDTO {
 
   private String status;
 
-  @NotNull
-  private Long founder;
-
   public GroupDTO() {
   }
 
-  public GroupDTO(String name, String status, Long founder) {
+  public GroupDTO(String name, String status) {
     this.name = name;
     this.status = status;
-    this.founder = founder;
   }
 
   public String getName() {
@@ -35,13 +31,5 @@ public class GroupDTO {
 
   public void setStatus(String status) {
     this.status = status;
-  }
-
-  public Long getFounder() {
-    return founder;
-  }
-
-  public void setFounder(Long founder) {
-    this.founder = founder;
   }
 }

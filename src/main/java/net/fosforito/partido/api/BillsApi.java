@@ -16,27 +16,34 @@ import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
 public class BillsApi {
 
-  @Inject
-  private GroupRepository groupRepository;
+  private final GroupRepository groupRepository;
+  private final BillRepository billRepository;
+  private final UserRepository userRepository;
+  private final CurrentUserContext currentUserContext;
 
   @Inject
-  private BillRepository billRepository;
-
-  @Inject
-  private UserRepository userRepository;
-
-  @Inject
-  private CurrentUserContext currentUserContext;
+  public BillsApi(GroupRepository groupRepository,
+                  BillRepository billRepository,
+                  UserRepository userRepository,
+                  CurrentUserContext currentUserContext) {
+    this.groupRepository = groupRepository;
+    this.billRepository = billRepository;
+    this.userRepository = userRepository;
+    this.currentUserContext = currentUserContext;
+  }
 
   @GetMapping(value = "/groups/{groupId}/bills", produces = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public List<Bill> getAllBillsForGroup(@PathVariable Long groupId) {
-    return billRepository.findAllByGroupId(groupId);
+    List<Bill> bills = billRepository.findAllByGroupId(groupId);
+    bills.sort(Collections.reverseOrder());
+    return bills;
   }
 
   @PostMapping(value = "/groups/{groupId}/bills", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)

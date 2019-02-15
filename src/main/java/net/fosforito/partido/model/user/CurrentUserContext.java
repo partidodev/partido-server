@@ -10,8 +10,12 @@ import javax.inject.Inject;
 @Service
 public class CurrentUserContext {
 
+  private final UserRepository userRepository;
+
   @Inject
-  private UserRepository userRepository;
+  public CurrentUserContext(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   public User getCurrentUser() {
     Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

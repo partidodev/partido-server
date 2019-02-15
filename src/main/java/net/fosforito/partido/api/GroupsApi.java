@@ -21,14 +21,18 @@ import java.util.List;
 @RestController
 public class GroupsApi {
 
-  @Inject
-  private GroupRepository groupRepository;
+  private final GroupRepository groupRepository;
+  private final UserRepository userRepository;
+  private final GroupService groupService;
 
   @Inject
-  private UserRepository userRepository;
-
-  @Inject
-  private GroupService groupService;
+  public GroupsApi(GroupRepository groupRepository,
+                   UserRepository userRepository,
+                   GroupService groupService) {
+    this.groupRepository = groupRepository;
+    this.userRepository = userRepository;
+    this.groupService = groupService;
+  }
 
   // Groups
 

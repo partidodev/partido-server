@@ -15,16 +15,17 @@ import java.util.List;
 @Service
 public class SecurityService {
 
-  @Inject
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
+  private final GroupRepository groupRepository;
+  private final BillRepository billRepository;
 
   @Inject
-  private GroupRepository groupRepository;
-
-  @Inject
-  private BillRepository billRepository;
-
-  public SecurityService() {
+  public SecurityService(UserRepository userRepository,
+                         GroupRepository groupRepository,
+                         BillRepository billRepository) {
+    this.userRepository = userRepository;
+    this.groupRepository = groupRepository;
+    this.billRepository = billRepository;
   }
 
   /**

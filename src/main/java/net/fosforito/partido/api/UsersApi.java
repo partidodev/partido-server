@@ -16,11 +16,15 @@ import javax.ws.rs.core.MediaType;
 @RestController
 public class UsersApi {
 
-  @Inject
-  private UserRepository userRepository;
+  private final UserRepository userRepository;
+  private final PasswordEncoder passwordEncoder;
 
   @Inject
-  private PasswordEncoder passwordEncoder;
+  public UsersApi(UserRepository userRepository,
+                  PasswordEncoder passwordEncoder) {
+    this.userRepository = userRepository;
+    this.passwordEncoder = passwordEncoder;
+  }
 
   @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON)
   @PreAuthorize("hasRole('ADMIN')")

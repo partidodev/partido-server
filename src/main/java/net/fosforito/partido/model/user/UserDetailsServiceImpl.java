@@ -16,8 +16,12 @@ import java.util.Set;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
+  private final UserRepository userRepository;
+
   @Inject
-  private UserRepository userRepository;
+  public UserDetailsServiceImpl(UserRepository userRepository) {
+    this.userRepository = userRepository;
+  }
 
   @Override
   @Transactional(readOnly = true)

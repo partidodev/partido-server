@@ -19,16 +19,20 @@ import javax.inject.Inject;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-  @Inject
-  private UserDetailsServiceImpl userDetailsService;
-
-  @Inject
-  private RestAuthenticationEntryPoint restAuthenticationEntryPoint;
-
-  @Inject
-  private MySavedRequestAwareAuthenticationSuccessHandler successHandler;
+  private final UserDetailsServiceImpl userDetailsService;
+  private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+  private final MySavedRequestAwareAuthenticationSuccessHandler successHandler;
 
   private SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
+
+  @Inject
+  public WebSecurityConfig(UserDetailsServiceImpl userDetailsService,
+                           RestAuthenticationEntryPoint restAuthenticationEntryPoint,
+                           MySavedRequestAwareAuthenticationSuccessHandler successHandler) {
+    this.userDetailsService = userDetailsService;
+    this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+    this.successHandler = successHandler;
+  }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {

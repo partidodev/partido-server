@@ -16,7 +16,7 @@ public class BillDTO {
   private BigDecimal totalAmount;
 
   @NotNull
-  private Date dateTime;
+  private Date billingDate;
 
   @NotNull
   private int parts;
@@ -28,12 +28,12 @@ public class BillDTO {
 
   public BillDTO(@NotNull String description,
                  @NotNull BigDecimal totalAmount,
-                 @NotNull Date dateTime,
+                 @NotNull Date billingDate,
                  @NotNull int parts,
                  List<SplitDTO> splits) {
     this.description = description;
     this.totalAmount = totalAmount;
-    this.dateTime = dateTime;
+    this.billingDate = billingDate;
     this.parts = parts;
     this.splits = splits;
   }
@@ -54,12 +54,12 @@ public class BillDTO {
     this.totalAmount = totalAmount;
   }
 
-  public Date getDateTime() {
-    return dateTime;
+  public Date getBillingDate() {
+    return billingDate;
   }
 
-  public void setDateTime(Date dateTime) {
-    this.dateTime = dateTime;
+  public void setBillingDate(Date billingDate) {
+    this.billingDate = billingDate;
   }
 
   public int getParts() {

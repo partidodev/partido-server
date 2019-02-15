@@ -54,7 +54,7 @@ public class BillsApi {
         billDTO.getDescription(),
         billDTO.getTotalAmount(),
         billDTO.getParts(),
-        billDTO.getDateTime(),
+        billDTO.getBillingDate(),
         new Date(),
         groupRepository.findById(groupId).get(),
         currentUserContext.getCurrentUser(),

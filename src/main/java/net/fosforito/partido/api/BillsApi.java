@@ -42,7 +42,7 @@ public class BillsApi {
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public List<Bill> getAllBillsForGroup(@PathVariable Long groupId) {
     List<Bill> bills = billRepository.findAllByGroupId(groupId);
-    bills.sort(Collections.reverseOrder());
+    bills.sort(Collections.reverseOrder(null));
     return bills;
   }
 

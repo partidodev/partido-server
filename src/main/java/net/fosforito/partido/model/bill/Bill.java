@@ -19,7 +19,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Bill {
+public class Bill implements Comparable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -145,6 +145,11 @@ public class Bill {
 
   public void setClosed(boolean closed) {
     this.closed = closed;
+  }
+
+  @Override
+  public int compareTo(Object o) {
+    return dateTime.compareTo(((Bill)o).getDateTime());
   }
 }
 

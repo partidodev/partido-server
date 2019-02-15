@@ -32,7 +32,10 @@ public class Bill implements Comparable {
   private BigDecimal totalAmount;
 
   @NotNull
-  private Date dateTime;
+  private Date billingDate;
+
+  @NotNull
+  private Date creationDate;
 
   @NotNull
   private int parts;
@@ -61,14 +64,16 @@ public class Bill implements Comparable {
   public Bill(@NotNull String description,
               @NotNull BigDecimal totalAmount,
               @NotNull int parts,
-              @NotNull Date dateTime,
+              @NotNull Date billingDate,
+              @NotNull Date creationDate,
               Group group,
               User creator,
               List<Split> splits) {
     this.description = description;
     this.totalAmount = totalAmount;
     this.parts = parts;
-    this.dateTime = dateTime;
+    this.billingDate = billingDate;
+    this.creationDate = creationDate;
     this.group = group;
     this.creator = creator;
     this.splits = splits;
@@ -107,12 +112,20 @@ public class Bill implements Comparable {
     this.parts = parts;
   }
 
-  public Date getDateTime() {
-    return dateTime;
+  public Date getBillingDate() {
+    return billingDate;
   }
 
-  public void setDateTime(Date dateTime) {
-    this.dateTime = dateTime;
+  public void setBillingDate(Date billingDate) {
+    this.billingDate = billingDate;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
   }
 
   public Group getGroup() {
@@ -149,7 +162,7 @@ public class Bill implements Comparable {
 
   @Override
   public int compareTo(Object o) {
-    return dateTime.compareTo(((Bill)o).getDateTime());
+    return creationDate.compareTo(((Bill)o).getCreationDate());
   }
 }
 

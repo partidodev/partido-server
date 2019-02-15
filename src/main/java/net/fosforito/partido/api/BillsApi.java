@@ -17,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -54,6 +55,7 @@ public class BillsApi {
         billDTO.getTotalAmount(),
         billDTO.getParts(),
         billDTO.getDateTime(),
+        new Date(),
         groupRepository.findById(groupId).get(),
         currentUserContext.getCurrentUser(),
         convertToSplits(billDTO.getSplits())

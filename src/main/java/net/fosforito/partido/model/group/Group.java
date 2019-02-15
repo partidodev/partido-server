@@ -1,6 +1,9 @@
 package net.fosforito.partido.model.group;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import net.fosforito.partido.model.user.User;
 
 import java.util.ArrayList;
@@ -26,6 +29,8 @@ public class Group {
 
   @ManyToOne
   @NotNull
+  @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
+  @JsonIdentityReference(alwaysAsId=true)
   private User founder;
 
   @ManyToMany(fetch = FetchType.LAZY,

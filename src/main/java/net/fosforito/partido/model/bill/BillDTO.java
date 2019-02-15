@@ -3,7 +3,6 @@ package net.fosforito.partido.model.bill;
 import net.fosforito.partido.model.split.SplitDTO;
 
 import javax.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -13,7 +12,7 @@ public class BillDTO {
   private String description;
 
   @NotNull
-  private BigDecimal totalAmount;
+  private double totalAmount;
 
   @NotNull
   private Date billingDate;
@@ -27,7 +26,7 @@ public class BillDTO {
   }
 
   public BillDTO(@NotNull String description,
-                 @NotNull BigDecimal totalAmount,
+                 @NotNull double totalAmount,
                  @NotNull Date billingDate,
                  @NotNull int parts,
                  List<SplitDTO> splits) {
@@ -46,11 +45,11 @@ public class BillDTO {
     this.description = description;
   }
 
-  public BigDecimal getTotalAmount() {
+  public double getTotalAmount() {
     return totalAmount;
   }
 
-  public void setTotalAmount(BigDecimal totalAmount) {
+  public void setTotalAmount(double totalAmount) {
     this.totalAmount = totalAmount;
   }
 

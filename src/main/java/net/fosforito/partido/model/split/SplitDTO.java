@@ -1,14 +1,10 @@
 package net.fosforito.partido.model.split;
 
-import java.math.BigDecimal;
-
 public class SplitDTO {
 
   private Long debtor;
 
-  private BigDecimal paid;
-
-  private BigDecimal borrows;
+  private double paid;
 
   private int partsOfBill;
 
@@ -18,13 +14,11 @@ public class SplitDTO {
   }
 
   public SplitDTO(Long debtor,
-                  BigDecimal paid,
-                  BigDecimal borrows,
+                  double paid,
                   int partsOfBill,
                   boolean main) {
     this.debtor = debtor;
     this.paid = paid;
-    this.borrows = borrows;
     this.partsOfBill = partsOfBill;
     this.main = main;
   }
@@ -37,20 +31,12 @@ public class SplitDTO {
     this.debtor = debtor;
   }
 
-  public BigDecimal getPaid() {
+  public double getPaid() {
     return paid;
   }
 
-  public void setPaid(BigDecimal paid) {
+  public void setPaid(double paid) {
     this.paid = paid;
-  }
-
-  public BigDecimal getBorrows() {
-    return borrows;
-  }
-
-  public void setBorrows(BigDecimal borrows) {
-    this.borrows = borrows;
   }
 
   public int getPartsOfBill() {

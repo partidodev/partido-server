@@ -1,27 +1,27 @@
 package net.fosforito.partido.model.report;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class Report {
 
-  private LocalDate timestamp;
+  private LocalDateTime timestamp;
 
   private List<Balance> balances;
 
   public Report() {
   }
 
-  public Report(LocalDate timestamp, List<Balance> balances) {
+  public Report(LocalDateTime timestamp, List<Balance> balances) {
     this.timestamp = timestamp;
     this.balances = balances;
   }
 
-  public LocalDate getTimestamp() {
+  public LocalDateTime getTimestamp() {
     return timestamp;
   }
 
-  public void setTimestamp(LocalDate timestamp) {
+  public void setTimestamp(LocalDateTime timestamp) {
     this.timestamp = timestamp;
   }
 

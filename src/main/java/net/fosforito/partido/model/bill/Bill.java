@@ -29,7 +29,7 @@ public class Bill implements Comparable {
   private String description;
 
   @NotNull
-  private BigDecimal totalAmount;
+  private double totalAmount;
 
   @NotNull
   private Date billingDate;
@@ -62,7 +62,7 @@ public class Bill implements Comparable {
   }
 
   public Bill(@NotNull String description,
-              @NotNull BigDecimal totalAmount,
+              @NotNull double totalAmount,
               @NotNull int parts,
               @NotNull Date billingDate,
               @NotNull Date creationDate,
@@ -96,11 +96,11 @@ public class Bill implements Comparable {
     this.description = description;
   }
 
-  public BigDecimal getTotalAmount() {
+  public double getTotalAmount() {
     return totalAmount;
   }
 
-  public void setTotalAmount(BigDecimal totalAmount) {
+  public void setTotalAmount(double totalAmount) {
     this.totalAmount = totalAmount;
   }
 

@@ -1,19 +1,22 @@
 package net.fosforito.partido.model.report;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import net.fosforito.partido.model.user.User;
-
-import java.math.BigDecimal;
 
 public class Balance {
 
+  @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+  @JsonIdentityReference(alwaysAsId = true)
   private User user;
 
-  private BigDecimal balance;
+  private double balance;
 
   public Balance() {
   }
 
-  public Balance(User user, BigDecimal balance) {
+  public Balance(User user, double balance) {
     this.user = user;
     this.balance = balance;
   }
@@ -26,11 +29,11 @@ public class Balance {
     this.user = user;
   }
 
-  public BigDecimal getBalance() {
+  public double getBalance() {
     return balance;
   }
 
-  public void setBalance(BigDecimal balance) {
+  public void setBalance(double balance) {
     this.balance = balance;
   }
 }

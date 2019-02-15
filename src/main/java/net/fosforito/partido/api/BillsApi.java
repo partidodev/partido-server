@@ -63,9 +63,9 @@ public class BillsApi {
     return billRepository.save(bill);
   }
 
-  @PutMapping(value = "/bills/{billId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
-  @PreAuthorize("@securityService.userCanReadGroup(principal, #billDTO.group)")
-  public Response updateBill(@PathVariable Long billId, @RequestBody BillDTO billDTO) {
+  @PutMapping(value = "/groups/{groupId}/bills/{billId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
+  @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
+  public Response updateBill(@PathVariable Long groupId, @PathVariable Long billId, @RequestBody BillDTO billDTO) {
     return Response.ok().entity("magic!").build();
     //TODO
   }
@@ -89,7 +89,6 @@ public class BillsApi {
       splits.add(new Split(
           userRepository.findById(splitDTO.getDebtor()).get(),
           splitDTO.getPaid(),
-          splitDTO.getBorrows(),
           splitDTO.getPartsOfBill(),
           splitDTO.isMain()
       ));

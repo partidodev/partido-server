@@ -10,5 +10,5 @@ public interface BillRepository extends JpaRepository<Bill, Long> {
 
   List<Bill> findAllByGroupId(Long groupId);
 
-  List<Bill> findAllOpenByGroupId(Long groupId);
+  List<Bill> findAllByGroupIdAndClosed(Long groupId, boolean closed);
 }

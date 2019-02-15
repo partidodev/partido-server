@@ -1,7 +1,5 @@
 package net.fosforito.partido.model.split;
 
-import java.math.BigDecimal;
-
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
@@ -25,15 +23,12 @@ public class Split {
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "debtor_user_id")
-  @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
-  @JsonIdentityReference(alwaysAsId=true)
+  @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+  @JsonIdentityReference(alwaysAsId = true)
   private User debtor;
 
   @NotNull
-  private BigDecimal paid;
-
-  @NotNull
-  private BigDecimal borrows;
+  private double paid;
 
   @NotNull
   private int partsOfBill;
@@ -45,13 +40,11 @@ public class Split {
   }
 
   public Split(User debtor,
-               @NotNull BigDecimal paid,
-               @NotNull BigDecimal borrows,
+               @NotNull double paid,
                @NotNull int partsOfBill,
                @NotNull boolean main) {
     this.debtor = debtor;
     this.paid = paid;
-    this.borrows = borrows;
     this.partsOfBill = partsOfBill;
     this.main = main;
   }
@@ -72,20 +65,12 @@ public class Split {
     this.debtor = debtor;
   }
 
-  public BigDecimal getPaid() {
+  public double getPaid() {
     return paid;
   }
 
-  public void setPaid(BigDecimal paid) {
+  public void setPaid(double paid) {
     this.paid = paid;
-  }
-
-  public BigDecimal getBorrows() {
-    return borrows;
-  }
-
-  public void setBorrows(BigDecimal borrows) {
-    this.borrows = borrows;
   }
 
   public int getPartsOfBill() {

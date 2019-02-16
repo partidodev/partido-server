@@ -48,7 +48,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .successHandler(successHandler)
         .failureHandler(failureHandler)
         .and()
-        .logout();
+        .logout()// default on /logout path
+        .deleteCookies("JSESSIONID")
+        .and()
+        .rememberMe()
+        .key("o#3vt9§q384tnzv%79384tz78t3*q7z983z&4894=)zvt783tt8&v") // secret for token generation
+        .tokenValiditySeconds(31536000); // 1 year
   }
 
   @Inject

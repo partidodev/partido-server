@@ -27,6 +27,9 @@ public class Group {
 
   private String status;
 
+  @NotNull
+  private String currency;
+
   @ManyToOne
   @NotNull
   @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -47,9 +50,10 @@ public class Group {
   public Group() {
   }
 
-  public Group(@NotNull String name, String status, @NotNull User founder, List<User> users) {
+  public Group(@NotNull String name, String status, @NotNull String currency, @NotNull User founder, List<User> users) {
     this.name = name;
     this.status = status;
+    this.currency = currency;
     this.founder = founder;
     this.users = users;
   }
@@ -76,6 +80,14 @@ public class Group {
 
   public void setStatus(String status) {
     this.status = status;
+  }
+
+  public String getCurrency() {
+    return currency;
+  }
+
+  public void setCurrency(String currency) {
+    this.currency = currency;
   }
 
   public User getFounder() {

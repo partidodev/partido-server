@@ -9,12 +9,16 @@ public class GroupDTO {
 
   private String status;
 
+  @NotNull
+  private String currency;
+
   public GroupDTO() {
   }
 
-  public GroupDTO(String name, String status) {
+  public GroupDTO(String name, String status, String currency) {
     this.name = name;
     this.status = status;
+    this.currency = currency;
   }
 
   public String getName() {
@@ -31,5 +35,13 @@ public class GroupDTO {
 
   public void setStatus(String status) {
     this.status = status;
+  }
+
+  public String getCurrency() {
+    return currency;
+  }
+
+  public void setCurrency(String currency) {
+    this.currency = currency;
   }
 }

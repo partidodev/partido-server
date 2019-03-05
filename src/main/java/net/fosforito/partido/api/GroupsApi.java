@@ -69,6 +69,7 @@ public class GroupsApi {
     Group group = new Group();
     group.setName(groupDTO.getName());
     group.setStatus(groupDTO.getStatus());
+    group.setCurrency(groupDTO.getCurrency());
     group.setFounder(founder);
     group.setUsers(userList);
     return groupRepository.save(group);
@@ -85,6 +86,7 @@ public class GroupsApi {
         .map(group -> {
           group.setName(groupDTO.getName());
           group.setStatus(groupDTO.getStatus());
+          group.setCurrency(groupDTO.getCurrency());
           return groupRepository.save(group);
         }).orElseThrow(() -> new Exception("Group not found with id " + groupId));
   }

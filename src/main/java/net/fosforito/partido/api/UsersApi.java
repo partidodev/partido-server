@@ -44,8 +44,7 @@ public class UsersApi {
   @PostMapping(value = {"/users"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   public User usersPost(@RequestBody UserDTO userDTO) {
     User user = new User();
-    user.setFirstNames(userDTO.getFirstNames());
-    user.setLastNames(userDTO.getLastNames());
+    user.setUsername(userDTO.getUsername());
     user.setEmail(userDTO.getEmail());
     user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
     user.setBirthday(userDTO.getBirthday());
@@ -82,8 +81,7 @@ public class UsersApi {
   public User usersUserIdPut(@PathVariable Long userId, @RequestBody UserDTO userDTO) throws Exception {
     return userRepository.findById(userId)
         .map(user -> {
-          user.setFirstNames(userDTO.getFirstNames());
-          user.setLastNames(userDTO.getLastNames());
+          user.setUsername(userDTO.getUsername());
           user.setEmail(userDTO.getEmail());
           user.setPassword(userDTO.getPassword());
           user.setBirthday(userDTO.getBirthday());

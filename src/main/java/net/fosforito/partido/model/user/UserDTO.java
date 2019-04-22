@@ -4,9 +4,7 @@ import java.time.LocalDate;
 
 public class UserDTO {
 
-  private String firstNames;
-
-  private String lastNames;
+  private String username;
 
   private String email;
 
@@ -17,28 +15,19 @@ public class UserDTO {
   public UserDTO() {
   }
 
-  public UserDTO(String firstNames, String lastNames, String email, String password, LocalDate birthday) {
-    this.firstNames = firstNames;
-    this.lastNames = lastNames;
+  public UserDTO(String username, String email, String password, LocalDate birthday) {
+    this.username = username;
     this.email = email;
     this.password = password;
     this.birthday = birthday;
   }
 
-  public String getFirstNames() {
-    return firstNames;
+  public String getUsername() {
+    return username;
   }
 
-  public void setFirstNames(String firstNames) {
-    this.firstNames = firstNames;
-  }
-
-  public String getLastNames() {
-    return lastNames;
-  }
-
-  public void setLastNames(String lastNames) {
-    this.lastNames = lastNames;
+  public void setUsername(String username) {
+    this.username = username;
   }
 
   public String getEmail() {

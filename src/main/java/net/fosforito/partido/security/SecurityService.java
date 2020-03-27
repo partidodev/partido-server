@@ -12,6 +12,10 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.util.List;
 
+/**
+ * This class contains functions to determine the rights
+ * of given users to perform specific actions in given groups.
+ */
 @Service
 public class SecurityService {
 
@@ -29,7 +33,10 @@ public class SecurityService {
   }
 
   /**
-   * Determine if a user can view a given image.
+   * Determine if a given user can update a given group
+   * @param userDetails of the user who wants to perform the action
+   * @param groupId of the group to be updated
+   * @return true if user can update group
    */
   public boolean userCanUpdateGroup(UserDetails userDetails, Long groupId) {
     User user = userRepository.findByEmail(userDetails.getUsername());
@@ -38,26 +45,58 @@ public class SecurityService {
         || userListContainsUser(group.getUsers(), user);
   }
 
+  /**
+   * Determine if a given user can read a given group
+   * @param userDetails of the user who wants to perform the action
+   * @param groupId of the group to be read
+   * @return true if user can read group
+   */
   public boolean userCanReadGroup(UserDetails userDetails, Long groupId) {
     return userCanUpdateGroup(userDetails, groupId);
   }
 
+  /**
+   * Determine if a given user is the founder of a given group
+   * @param userDetails of the user
+   * @param groupId of the group
+   * @return true if user is the founder of the group
+   */
   public boolean userIsFounderOfGroup(UserDetails userDetails, Long groupId) {
     User user = userRepository.findByEmail(userDetails.getUsername());
     Group group = groupRepository.findById(groupId).get();
     return userIsFounderOfGroup(user, group);
   }
 
+  /**
+   * Determine if a given user is the founder of a given group
+   * @param user user object
+   * @param group group object
+   * @return true if user is the founder of the group
+   */
   public boolean userIsFounderOfGroup(User user, Group group) {
     return group.getFounder().getId().equals(user.getId());
   }
 
+  /**
+   * Determine if a given user is the founder of a given group
+   * @param userId user id
+   * @param groupId group id
+   * @return true if user is NOT the founder of the group
+   */
   public boolean userIsNotFounderOfGroup(Long userId, Long groupId) {
     User user = userRepository.findById(userId).get();
     Group group = groupRepository.findById(groupId).get();
     return !userIsFounderOfGroup(user, group);
   }
 
+  /**
+   * Determine if given user details are from the same user with
+   * a given id and if the user is in a specific group.
+   * @param userDetails details of teh given user
+   * @param userId id  of the given user
+   * @param groupId id of the given group
+   * @return true if user details and id are from the same user and the user is in the given group
+   */
   public boolean userIsSameUserAndFromGroup(UserDetails userDetails, Long userId, Long groupId) {
     User user = userRepository.findByEmail(userDetails.getUsername());
     Group group = groupRepository.findById(groupId).get();
@@ -65,11 +104,23 @@ public class SecurityService {
         && user.getId().equals(userId);
   }
 
+  /**
+   * Determine if given user details are from the same user with a given id
+   * @param userDetails details of the given user
+   * @param userId id of the given user
+   * @return true if details and id are from the same user
+   */
   public boolean userIsSameUser(UserDetails userDetails, Long userId) {
     User user = userRepository.findByEmail(userDetails.getUsername());
     return user.getId().equals(userId);
   }
 
+  /**
+   * Determine if a given user can delete a given bill
+   * @param userDetails details off the given user
+   * @param billId id of the given bill
+   * @return true if the user can delete the bill
+   */
   public  boolean userCanDeleteBill(UserDetails userDetails, Long billId) {
     User user = userRepository.findByEmail(userDetails.getUsername());
     Bill bill = billRepository.findById(billId).get();
@@ -77,6 +128,12 @@ public class SecurityService {
         || bill.getCreator().getId().equals(user.getId());
   }
 
+  /**
+   * Determine if a given list of users contains a given user
+   * @param userList list of users in which to search
+   * @param user User to be searched in the list
+   * @return true if the user is in the list
+   */
   public boolean userListContainsUser(List<User> userList, User user) {
     for (User listUser : userList) {
       if (listUser.getId().equals(user.getId())) {

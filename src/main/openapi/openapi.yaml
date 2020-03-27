@@ -3,8 +3,7 @@ info:
   contact:
     email: fosforito280@gmail.com
     name: Jens Leon Wagner
-  description: An API for keeping track of your bills and your friend with whom you
-    share them.
+  description: An API for keeping track of your shared bills.
   termsOfService: ""
   title: Partido API
   version: 1.0.0

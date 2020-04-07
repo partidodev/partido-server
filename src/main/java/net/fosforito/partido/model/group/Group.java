@@ -30,6 +30,7 @@ public class Group {
   @NotNull
   private String currency;
 
+  @NotNull
   private boolean joinModeActive;
 
   private String joinKey;
@@ -58,7 +59,7 @@ public class Group {
           @NotNull String name,
           String status,
           @NotNull String currency,
-          boolean joinModeActive,
+          @NotNull boolean joinModeActive,
           String joinKey,
           @NotNull User founder, List<User> users
   ) {

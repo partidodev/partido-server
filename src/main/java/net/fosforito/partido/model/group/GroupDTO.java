@@ -12,6 +12,7 @@ public class GroupDTO {
   @NotNull
   private String currency;
 
+  @NotNull
   private boolean joinModeActive;
 
   private String joinKey;

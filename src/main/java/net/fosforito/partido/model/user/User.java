@@ -3,7 +3,6 @@ package net.fosforito.partido.model.user;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import net.fosforito.partido.model.role.Role;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import javax.persistence.*;
@@ -28,8 +27,6 @@ public class User {
   @JsonIgnore
   private String password;
 
-  private LocalDate birthday;
-
   @JsonIgnore
   private Boolean active;
 
@@ -41,11 +38,10 @@ public class User {
   public User() {
   }
 
-  public User(String username, String email, String password, LocalDate birthday, Boolean active) {
+  public User(String username, String email, String password, Boolean active) {
     this.username = username;
     this.email = email;
     this.password = password;
-    this.birthday = birthday;
     this.active = active;
   }
 
@@ -79,14 +75,6 @@ public class User {
 
   public void setPassword(String password) {
     this.password = password;
-  }
-
-  public LocalDate getBirthday() {
-    return birthday;
-  }
-
-  public void setBirthday(LocalDate birthday) {
-    this.birthday = birthday;
   }
 
   public Boolean getActive() {

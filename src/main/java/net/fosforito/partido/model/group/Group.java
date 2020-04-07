@@ -30,6 +30,10 @@ public class Group {
   @NotNull
   private String currency;
 
+  private boolean joinModeActive;
+
+  private String joinKey;
+
   @ManyToOne
   @NotNull
   @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -50,10 +54,19 @@ public class Group {
   public Group() {
   }
 
-  public Group(@NotNull String name, String status, @NotNull String currency, @NotNull User founder, List<User> users) {
+  public Group(
+          @NotNull String name,
+          String status,
+          @NotNull String currency,
+          boolean joinModeActive,
+          String joinKey,
+          @NotNull User founder, List<User> users
+  ) {
     this.name = name;
     this.status = status;
     this.currency = currency;
+    this.joinModeActive = joinModeActive;
+    this.joinKey = joinKey;
     this.founder = founder;
     this.users = users;
   }
@@ -88,6 +101,22 @@ public class Group {
 
   public void setCurrency(String currency) {
     this.currency = currency;
+  }
+
+  public boolean isJoinModeActive() {
+    return joinModeActive;
+  }
+
+  public void setJoinModeActive(boolean joinModeActive) {
+    this.joinModeActive = joinModeActive;
+  }
+
+  public String getJoinKey() {
+    return joinKey;
+  }
+
+  public void setJoinKey(String joinKey) {
+    this.joinKey = joinKey;
   }
 
   public User getFounder() {

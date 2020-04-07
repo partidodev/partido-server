@@ -33,20 +33,15 @@ public class Split {
   @NotNull
   private int partsOfBill;
 
-  @NotNull
-  private boolean main;
-
   public Split() {
   }
 
   public Split(User debtor,
                @NotNull double paid,
-               @NotNull int partsOfBill,
-               @NotNull boolean main) {
+               @NotNull int partsOfBill) {
     this.debtor = debtor;
     this.paid = paid;
     this.partsOfBill = partsOfBill;
-    this.main = main;
   }
 
   public Long getId() {
@@ -79,14 +74,6 @@ public class Split {
 
   public void setPartsOfBill(int partsOfBill) {
     this.partsOfBill = partsOfBill;
-  }
-
-  public boolean isMain() {
-    return main;
-  }
-
-  public void setMain(boolean main) {
-    this.main = main;
   }
 }
 

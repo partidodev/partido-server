@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class GroupsApi {
@@ -70,6 +72,8 @@ public class GroupsApi {
     group.setName(groupDTO.getName());
     group.setStatus(groupDTO.getStatus());
     group.setCurrency(groupDTO.getCurrency());
+    group.setJoinModeActive(groupDTO.isJoinModeActive());
+    group.setJoinKey(groupDTO.getJoinKey());
     group.setFounder(founder);
     group.setUsers(userList);
     return groupRepository.save(group);
@@ -87,6 +91,8 @@ public class GroupsApi {
           group.setName(groupDTO.getName());
           group.setStatus(groupDTO.getStatus());
           group.setCurrency(groupDTO.getCurrency());
+          group.setJoinModeActive(groupDTO.isJoinModeActive());
+          group.setJoinKey(groupDTO.getJoinKey());
           return groupRepository.save(group);
         }).orElseThrow(() -> new Exception("Group not found with id " + groupId));
   }
@@ -111,16 +117,68 @@ public class GroupsApi {
         }).orElseThrow(() -> new Exception("Group not found with id " + groupId));
   }
 
+  /**
+   * Not used by group members. Every user who wants to join a group, must join it explicitly with a joinKey
+   * @param groupId ID of group where a user wants to join
+   * @param userId ID of user to join in group
+   * @return Group object with updated user list or old user list if user already is in group
+   * @throws Exception if user cannot be added to group
+   */
   @PostMapping(value = "/groups/{groupId}/users/{userId}", produces = MediaType.APPLICATION_JSON)
-  @PreAuthorize("@securityService.userCanUpdateGroup(principal, #groupId)")
+  @PreAuthorize("@securityService.userCanUpdateGroup(principal, #groupId) && hasRole('ADMIN')")
   public Group addUserToGroup(@PathVariable Long groupId, @PathVariable Long userId) throws Exception {
-    //TODO: check if user already exists in group
     return groupRepository.findById(groupId).map(group -> {
       List<User> groupUsers = group.getUsers();
+      for (User user : groupUsers) {
+        if (user.getId().equals(userId)) {
+          return group; // User already in group, just return the group as it is
+        }
+      }
       groupUsers.add(userRepository.findById(userId).get());
       group.setUsers(groupUsers);
       return groupRepository.save(group);
     }).orElseThrow(() -> new Exception("Cannot add user with id " + userId + " to group with id " + groupId));
+  }
+
+  /**
+   * Try to join a group.
+   * - Returns status code 404 (not found) if group or user does not exist.
+   * - Returns status code 304 (not modified) if user is already in the group, returns the group object.
+   * - Returns status code 200 (ok) if user has been added to group successfully, returns the updated group object.
+   * - Returns status code 401 (unauthorized) if group's join mode is inactive or invalid join key was provided.
+   * @param groupId ID of group to jin
+   * @param userId ID of user who wants to join group
+   * @param joinKey Join key of the group
+   * @return Status code and group object as described above
+   */
+  @PostMapping(value = "/groups/{groupId}/join/{userId}", produces = MediaType.APPLICATION_JSON)
+  public Response joinGroup(@PathVariable Long groupId, @PathVariable Long userId, @RequestBody String joinKey) {
+
+    Optional<Group> optionalGroup = groupRepository.findById(groupId);
+    Optional<User> optionalUser = userRepository.findById(userId);
+    Group group;
+    User user;
+
+    if (optionalGroup.isPresent() && optionalUser.isPresent()) {
+      group = optionalGroup.get();
+      user = optionalUser.get();
+    } else {
+      return Response.status(Response.Status.NOT_FOUND).entity("User or group not found").build();
+    }
+
+    if (group.isJoinModeActive() && group.getJoinKey().equals(joinKey)) {
+      List<User> groupUsers = group.getUsers();
+      for (User groupUser : groupUsers) {
+        if (groupUser.getId().equals(userId)) {
+          return Response.status(Response.Status.NOT_MODIFIED).entity(group).build();
+        }
+      }
+      groupUsers.add(user);
+      group.setUsers(groupUsers);
+      return Response.ok().entity(group).build();
+    } else {
+      return Response.status(Response.Status.UNAUTHORIZED).entity("User is unauthorized to join this group").build();
+    }
   }
 
   @DeleteMapping(value = "/groups/{groupId}/users/{userId}", produces = MediaType.APPLICATION_JSON)

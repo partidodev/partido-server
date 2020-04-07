@@ -8,19 +8,15 @@ public class SplitDTO {
 
   private int partsOfBill;
 
-  private boolean main;
-
   public SplitDTO() {
   }
 
   public SplitDTO(Long debtor,
                   double paid,
-                  int partsOfBill,
-                  boolean main) {
+                  int partsOfBill) {
     this.debtor = debtor;
     this.paid = paid;
     this.partsOfBill = partsOfBill;
-    this.main = main;
   }
 
   public Long getDebtor() {
@@ -45,13 +41,5 @@ public class SplitDTO {
 
   public void setPartsOfBill(int partsOfBill) {
     this.partsOfBill = partsOfBill;
-  }
-
-  public boolean isMain() {
-    return main;
-  }
-
-  public void setMain(boolean main) {
-    this.main = main;
   }
 }

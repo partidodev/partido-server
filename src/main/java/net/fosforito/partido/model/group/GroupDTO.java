@@ -12,13 +12,19 @@ public class GroupDTO {
   @NotNull
   private String currency;
 
+  private boolean joinModeActive;
+
+  private String joinKey;
+
   public GroupDTO() {
   }
 
-  public GroupDTO(String name, String status, String currency) {
+  public GroupDTO(String name, String status, String currency, boolean joinModeActive, String joinKey) {
     this.name = name;
     this.status = status;
     this.currency = currency;
+    this.joinModeActive = joinModeActive;
+    this.joinKey = joinKey;
   }
 
   public String getName() {
@@ -43,5 +49,21 @@ public class GroupDTO {
 
   public void setCurrency(String currency) {
     this.currency = currency;
+  }
+
+  public boolean isJoinModeActive() {
+    return joinModeActive;
+  }
+
+  public void setJoinModeActive(boolean joinModeActive) {
+    this.joinModeActive = joinModeActive;
+  }
+
+  public String getJoinKey() {
+    return joinKey;
+  }
+
+  public void setJoinKey(String joinKey) {
+    this.joinKey = joinKey;
   }
 }

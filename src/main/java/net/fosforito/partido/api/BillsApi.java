@@ -89,8 +89,7 @@ public class BillsApi {
       splits.add(new Split(
           userRepository.findById(splitDTO.getDebtor()).get(),
           splitDTO.getPaid(),
-          splitDTO.getPartsOfBill(),
-          splitDTO.isMain()
+          splitDTO.getPartsOfBill()
       ));
     }
     return splits;

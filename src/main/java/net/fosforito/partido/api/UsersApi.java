@@ -47,7 +47,6 @@ public class UsersApi {
     user.setUsername(userDTO.getUsername());
     user.setEmail(userDTO.getEmail());
     user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-    user.setBirthday(userDTO.getBirthday());
     user.setActive(true); //TODO: verify Email
     return userRepository.save(user);
   }
@@ -84,7 +83,6 @@ public class UsersApi {
           user.setUsername(userDTO.getUsername());
           user.setEmail(userDTO.getEmail());
           user.setPassword(userDTO.getPassword());
-          user.setBirthday(userDTO.getBirthday());
           return userRepository.save(user);
         }).orElseThrow(() -> new Exception("User not found with id " + userId));
   }

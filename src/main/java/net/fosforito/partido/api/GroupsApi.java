@@ -1,9 +1,6 @@
 package net.fosforito.partido.api;
 
-import net.fosforito.partido.model.group.Group;
-import net.fosforito.partido.model.group.GroupDTO;
-import net.fosforito.partido.model.group.GroupRepository;
-import net.fosforito.partido.model.group.GroupService;
+import net.fosforito.partido.model.group.*;
 import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
@@ -147,15 +144,14 @@ public class GroupsApi {
    * - Returns status code 200 (ok) if user has been added to group successfully, returns the updated group object.
    * - Returns status code 401 (unauthorized) if group's join mode is inactive or invalid join key was provided.
    * @param groupId ID of group to jin
-   * @param userId ID of user who wants to join group
-   * @param joinKey Join key of the group
+   * @param groupJoinBodyDTO conatins the id of user who wants to join group and the group key
    * @return Status code and group object as described above
    */
-  @PostMapping(value = "/groups/{groupId}/join/{userId}", produces = MediaType.APPLICATION_JSON)
-  public Response joinGroup(@PathVariable Long groupId, @PathVariable Long userId, @RequestBody String joinKey) {
+  @PostMapping(value = "/groups/{groupId}/join", produces = MediaType.APPLICATION_JSON)
+  public Response joinGroup(@PathVariable Long groupId, @RequestBody GroupJoinBodyDTO groupJoinBodyDTO) {
 
     Optional<Group> optionalGroup = groupRepository.findById(groupId);
-    Optional<User> optionalUser = userRepository.findById(userId);
+    Optional<User> optionalUser = userRepository.findById(groupJoinBodyDTO.getUserId());
     Group group;
     User user;
 
@@ -166,15 +162,16 @@ public class GroupsApi {
       return Response.status(Response.Status.NOT_FOUND).entity("User or group not found").build();
     }
 
-    if (group.isJoinModeActive() && group.getJoinKey().equals(joinKey)) {
+    if (group.isJoinModeActive() && group.getJoinKey().equals(groupJoinBodyDTO.getJoinKey())) {
       List<User> groupUsers = group.getUsers();
       for (User groupUser : groupUsers) {
-        if (groupUser.getId().equals(userId)) {
+        if (groupUser.getId().equals(groupJoinBodyDTO.getUserId())) {
           return Response.status(Response.Status.NOT_MODIFIED).entity(group).build();
         }
       }
       groupUsers.add(user);
       group.setUsers(groupUsers);
+      groupRepository.save(group);
       return Response.ok().entity(group).build();
     } else {
       return Response.status(Response.Status.UNAUTHORIZED).entity("User is unauthorized to join this group").build();

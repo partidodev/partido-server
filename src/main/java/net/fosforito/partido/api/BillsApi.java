@@ -8,6 +8,7 @@ import net.fosforito.partido.model.split.Split;
 import net.fosforito.partido.model.split.SplitDTO;
 import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.UserRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -78,9 +79,12 @@ public class BillsApi {
 
   @DeleteMapping(value = "/bills/{billId}")
   @PreAuthorize("@securityService.userCanDeleteBill(principal, #billId)")
-  public Response deleteBill(@PathVariable Long billId) {
-    return Response.ok().entity("magic!").build();
-    //TODO
+  public ResponseEntity<?> deleteBill(@PathVariable Long billId) throws Exception {
+    return billRepository.findById(billId)
+            .map(bill -> {
+              billRepository.delete(bill);
+              return ResponseEntity.ok().build();
+            }).orElseThrow(() -> new Exception("Bill not found with id " + billId));
   }
 
   private List<Split> convertToSplits(List<SplitDTO> splitDTOs) {

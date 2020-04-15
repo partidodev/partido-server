@@ -149,7 +149,8 @@ public class Bill implements Comparable {
   }
 
   public void setSplits(List<Split> splits) {
-    this.splits = splits;
+    this.splits.clear();
+    this.splits.addAll(splits);
   }
 
   public boolean isClosed() {

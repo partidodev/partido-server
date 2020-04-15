@@ -46,7 +46,7 @@ public class Bill implements Comparable {
   @JsonIgnore
   private Group group;
 
-  @OneToOne(cascade = CascadeType.ALL)
+  @OneToOne
   @JoinColumn(name = "creator_user_id")
   @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
   @JsonIdentityReference(alwaysAsId=true)

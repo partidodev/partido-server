@@ -66,9 +66,16 @@ public class BillsApi {
 
   @PutMapping(value = "/groups/{groupId}/bills/{billId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
-  public Response updateBill(@PathVariable Long groupId, @PathVariable Long billId, @RequestBody BillDTO billDTO) {
-    return Response.ok().entity("magic!").build();
-    //TODO
+  public Bill updateBill(@PathVariable Long groupId, @PathVariable Long billId, @RequestBody BillDTO billDTO) throws Exception {
+    return billRepository.findById(billId)
+            .map(bill -> {
+              bill.setDescription(billDTO.getDescription());
+              bill.setTotalAmount(billDTO.getTotalAmount());
+              bill.setParts(billDTO.getParts());
+              bill.setBillingDate(billDTO.getBillingDate());
+              bill.setSplits(convertToSplits(billDTO.getSplits()));
+              return billRepository.save(bill);
+            }).orElseThrow(() -> new Exception("Bill not found with id " + billId));
   }
 
   @GetMapping(value = "/bills/{billId}", produces = MediaType.APPLICATION_JSON)

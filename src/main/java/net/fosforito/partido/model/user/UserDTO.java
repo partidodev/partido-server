@@ -1,20 +1,28 @@
 package net.fosforito.partido.model.user;
 
+import javax.validation.constraints.NotNull;
+
 public class UserDTO {
 
+  @NotNull
   private String username;
 
+  @NotNull
   private String email;
 
+  @NotNull
   private String password;
+
+  private String newPassword;
 
   public UserDTO() {
   }
 
-  public UserDTO(String username, String email, String password) {
+  public UserDTO(@NotNull String username, @NotNull String email, @NotNull String password, String newPassword) {
     this.username = username;
     this.email = email;
     this.password = password;
+    this.newPassword = newPassword;
   }
 
   public String getUsername() {
@@ -39,5 +47,13 @@ public class UserDTO {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public String getNewPassword() {
+    return newPassword;
+  }
+
+  public void setNewPassword(String newPassword) {
+    this.newPassword = newPassword;
   }
 }

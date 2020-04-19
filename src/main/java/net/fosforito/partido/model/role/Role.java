@@ -1,9 +1,6 @@
 package net.fosforito.partido.model.role;
 
-import net.fosforito.partido.model.user.User;
-
 import javax.persistence.*;
-import java.util.Set;
 
 @Entity
 public class Role {
@@ -13,9 +10,6 @@ public class Role {
   private Long id;
 
   private String name;
-
-  @ManyToMany(mappedBy = "roles")
-  private Set<User> users;
 
   public Long getId() {
     return id;
@@ -31,13 +25,5 @@ public class Role {
 
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Set<User> getUsers() {
-    return users;
-  }
-
-  public void setUsers(Set<User> users) {
-    this.users = users;
   }
 }

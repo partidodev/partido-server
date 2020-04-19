@@ -1,19 +1,23 @@
 package net.fosforito.partido.model.split;
 
+import javax.validation.constraints.NotNull;
+
 public class SplitDTO {
 
   private Long debtor;
 
+  @NotNull
   private double paid;
 
+  @NotNull
   private int partsOfBill;
 
   public SplitDTO() {
   }
 
   public SplitDTO(Long debtor,
-                  double paid,
-                  int partsOfBill) {
+                  @NotNull double paid,
+                  @NotNull int partsOfBill) {
     this.debtor = debtor;
     this.paid = paid;
     this.partsOfBill = partsOfBill;

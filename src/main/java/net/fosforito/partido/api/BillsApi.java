@@ -3,11 +3,14 @@ package net.fosforito.partido.api;
 import net.fosforito.partido.model.bill.Bill;
 import net.fosforito.partido.model.bill.BillDTO;
 import net.fosforito.partido.model.bill.BillRepository;
+import net.fosforito.partido.model.group.Group;
 import net.fosforito.partido.model.group.GroupRepository;
 import net.fosforito.partido.model.split.Split;
 import net.fosforito.partido.model.split.SplitDTO;
 import net.fosforito.partido.model.user.CurrentUserContext;
+import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -16,10 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @RestController
 public class BillsApi {
@@ -50,38 +50,47 @@ public class BillsApi {
 
   @PostMapping(value = "/groups/{groupId}/bills", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
-  public Bill createBillForGroup(@RequestBody BillDTO billDTO, @PathVariable Long groupId) {
-    Bill bill = new Bill(
-        billDTO.getDescription(),
-        billDTO.getTotalAmount(),
-        billDTO.getParts(),
-        billDTO.getBillingDate(),
-        new Date(),
-        groupRepository.findById(groupId).get(),
-        currentUserContext.getCurrentUser(),
-        convertToSplits(billDTO.getSplits())
-    );
-    return billRepository.save(bill);
+  public ResponseEntity<Bill> createBillForGroup(@RequestBody BillDTO billDTO, @PathVariable Long groupId) {
+    Optional<Group> groupOptional = groupRepository.findById(groupId);
+    if (groupOptional.isPresent()) {
+      Bill bill = new Bill(
+              billDTO.getDescription(),
+              billDTO.getTotalAmount(),
+              billDTO.getParts(),
+              billDTO.getBillingDate(),
+              new Date(),
+              groupOptional.get(),
+              currentUserContext.getCurrentUser(),
+              convertToSplits(billDTO.getSplits())
+      );
+      return new ResponseEntity<>(billRepository.save(bill), HttpStatus.OK);
+    }
+    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
   @PutMapping(value = "/groups/{groupId}/bills/{billId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
-  public Bill updateBill(@PathVariable Long groupId, @PathVariable Long billId, @RequestBody BillDTO billDTO) throws Exception {
-    return billRepository.findById(billId)
-            .map(bill -> {
-              bill.setDescription(billDTO.getDescription());
-              bill.setTotalAmount(billDTO.getTotalAmount());
-              bill.setParts(billDTO.getParts());
-              bill.setBillingDate(billDTO.getBillingDate());
-              bill.setSplits(convertToSplits(billDTO.getSplits()));
-              return billRepository.save(bill);
-            }).orElseThrow(() -> new Exception("Bill not found with id " + billId));
+  public ResponseEntity<Bill> updateBill(@PathVariable Long groupId, @PathVariable Long billId, @RequestBody BillDTO billDTO) throws Exception {
+    Optional<Bill> billOptional = billRepository.findById(billId);
+    if (billOptional.isPresent()) {
+      return new ResponseEntity<>(billOptional.map(bill -> {
+        bill.setDescription(billDTO.getDescription());
+        bill.setTotalAmount(billDTO.getTotalAmount());
+        bill.setParts(billDTO.getParts());
+        bill.setBillingDate(billDTO.getBillingDate());
+        bill.setSplits(convertToSplits(billDTO.getSplits()));
+        return billRepository.save(bill);
+      }).get(), HttpStatus.OK);
+    }
+    return ResponseEntity.notFound().build();
   }
 
   @GetMapping(value = "/bills/{billId}", produces = MediaType.APPLICATION_JSON)
-  @PostAuthorize("@securityService.userCanReadGroup(principal, returnObject.group.id)")
-  public Bill getBill(@PathVariable Long billId) {
-    return billRepository.findById(billId).get();
+  @PostAuthorize("@securityService.userCanReadGroup(principal, returnObject.body.group.id)")
+  public ResponseEntity<Bill> getBill(@PathVariable Long billId) {
+    Optional<Bill> billOptional = billRepository.findById(billId);
+    return billOptional.map(bill -> new ResponseEntity<>(bill, HttpStatus.OK))
+            .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @DeleteMapping(value = "/bills/{billId}")
@@ -97,11 +106,12 @@ public class BillsApi {
   private List<Split> convertToSplits(List<SplitDTO> splitDTOs) {
     List<Split> splits = new ArrayList<>();
     for (SplitDTO splitDTO : splitDTOs) {
-      splits.add(new Split(
-          userRepository.findById(splitDTO.getDebtor()).get(),
-          splitDTO.getPaid(),
-          splitDTO.getPartsOfBill()
-      ));
+      Optional<User> userOptional = userRepository.findById(splitDTO.getDebtor());
+      userOptional.ifPresent(user -> splits.add(new Split(
+              user,
+              splitDTO.getPaid(),
+              splitDTO.getPartsOfBill()
+      )));
     }
     return splits;
   }

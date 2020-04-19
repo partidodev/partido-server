@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 /**
  * The Entry Point will not redirect to any sort of Login - it will return the 401
+ * Do not use status code 401 in other places because it is used in clients to
+ * redirect to login if get as response by server.
  */
 @Component
 public final class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {

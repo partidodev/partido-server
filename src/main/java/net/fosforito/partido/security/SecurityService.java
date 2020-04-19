@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * This class contains functions to determine the rights
@@ -40,9 +41,10 @@ public class SecurityService {
    */
   public boolean userCanUpdateGroup(UserDetails userDetails, Long groupId) {
     User user = userRepository.findByEmail(userDetails.getUsername());
-    Group group = groupRepository.findById(groupId).get();
-    return userIsFounderOfGroup(user, group)
-        || userListContainsUser(group.getUsers(), user);
+    Optional<Group> groupOptional = groupRepository.findById(groupId);
+    return groupOptional
+            .filter(group -> userIsFounderOfGroup(user, group) || userListContainsUser(group.getUsers(), user))
+            .isPresent();
   }
 
   /**
@@ -62,9 +64,11 @@ public class SecurityService {
    * @return true if user is the founder of the group
    */
   public boolean userIsFounderOfGroup(UserDetails userDetails, Long groupId) {
+    Optional<Group> groupOptional = groupRepository.findById(groupId);
     User user = userRepository.findByEmail(userDetails.getUsername());
-    Group group = groupRepository.findById(groupId).get();
-    return userIsFounderOfGroup(user, group);
+    return groupOptional
+            .filter(group -> userIsFounderOfGroup(user, group))
+            .isPresent();
   }
 
   /**
@@ -84,9 +88,12 @@ public class SecurityService {
    * @return true if user is NOT the founder of the group
    */
   public boolean userIsNotFounderOfGroup(Long userId, Long groupId) {
-    User user = userRepository.findById(userId).get();
-    Group group = groupRepository.findById(groupId).get();
-    return !userIsFounderOfGroup(user, group);
+    Optional<User> userOptional = userRepository.findById(userId);
+    Optional<Group> groupOptional = groupRepository.findById(groupId);
+    if (userOptional.isPresent() && groupOptional.isPresent()) {
+      return !userIsFounderOfGroup(userOptional.get(), groupOptional.get());
+    }
+    return false;
   }
 
   /**
@@ -99,9 +106,12 @@ public class SecurityService {
    */
   public boolean userIsSameUserAndFromGroup(UserDetails userDetails, Long userId, Long groupId) {
     User user = userRepository.findByEmail(userDetails.getUsername());
-    Group group = groupRepository.findById(groupId).get();
-    return (userListContainsUser(group.getUsers(), user) || userIsFounderOfGroup(user, group))
-        && user.getId().equals(userId);
+    Optional<Group> groupOptional = groupRepository.findById(groupId);
+    return groupOptional
+            .filter(group -> (
+                    userListContainsUser(group.getUsers(), user) || userIsFounderOfGroup(user, group)
+            ) && user.getId().equals(userId))
+            .isPresent();
   }
 
   /**
@@ -123,9 +133,11 @@ public class SecurityService {
    */
   public  boolean userCanDeleteBill(UserDetails userDetails, Long billId) {
     User user = userRepository.findByEmail(userDetails.getUsername());
-    Bill bill = billRepository.findById(billId).get();
-    return userIsFounderOfGroup(user, bill.getGroup())
-        || bill.getCreator().getId().equals(user.getId());
+    Optional<Bill> billOptional = billRepository.findById(billId);
+    return billOptional
+            .filter(bill -> userIsFounderOfGroup(user, bill.getGroup())
+                    || bill.getCreator().getId().equals(user.getId()))
+            .isPresent();
   }
 
   /**

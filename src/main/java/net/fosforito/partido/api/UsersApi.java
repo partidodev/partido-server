@@ -94,7 +94,7 @@ public class UsersApi {
       return new ResponseEntity<>(userOptional.map(user -> {
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
-        if (userDTO.getNewPassword() != null) {
+        if (userDTO.getNewPassword() != null && userDTO.getNewPassword().length() > 6) {
           user.setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
         }
         return userRepository.save(user);

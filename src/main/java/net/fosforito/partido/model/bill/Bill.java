@@ -38,7 +38,7 @@ public class Bill implements Comparable {
   private Date creationDate;
 
   @NotNull
-  private int parts;
+  private double parts;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "group_id", nullable = false)
@@ -63,7 +63,7 @@ public class Bill implements Comparable {
 
   public Bill(@NotNull String description,
               @NotNull double totalAmount,
-              @NotNull int parts,
+              @NotNull double parts,
               @NotNull Date billingDate,
               @NotNull Date creationDate,
               Group group,
@@ -104,11 +104,11 @@ public class Bill implements Comparable {
     this.totalAmount = totalAmount;
   }
 
-  public int getParts() {
+  public double getParts() {
     return parts;
   }
 
-  public void setParts(int parts) {
+  public void setParts(double parts) {
     this.parts = parts;
   }
 

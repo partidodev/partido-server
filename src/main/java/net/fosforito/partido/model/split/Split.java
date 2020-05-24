@@ -31,14 +31,14 @@ public class Split {
   private double paid;
 
   @NotNull
-  private int partsOfBill;
+  private double partsOfBill;
 
   public Split() {
   }
 
   public Split(User debtor,
                @NotNull double paid,
-               @NotNull int partsOfBill) {
+               @NotNull double partsOfBill) {
     this.debtor = debtor;
     this.paid = paid;
     this.partsOfBill = partsOfBill;
@@ -68,11 +68,11 @@ public class Split {
     this.paid = paid;
   }
 
-  public int getPartsOfBill() {
+  public double getPartsOfBill() {
     return partsOfBill;
   }
 
-  public void setPartsOfBill(int partsOfBill) {
+  public void setPartsOfBill(double partsOfBill) {
     this.partsOfBill = partsOfBill;
   }
 }

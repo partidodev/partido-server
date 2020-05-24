@@ -18,7 +18,7 @@ public class BillDTO {
   private Date billingDate;
 
   @NotNull
-  private int parts;
+  private double parts;
 
   private List<SplitDTO> splits;
 
@@ -28,7 +28,7 @@ public class BillDTO {
   public BillDTO(@NotNull String description,
                  @NotNull double totalAmount,
                  @NotNull Date billingDate,
-                 @NotNull int parts,
+                 @NotNull double parts,
                  List<SplitDTO> splits) {
     this.description = description;
     this.totalAmount = totalAmount;
@@ -61,11 +61,11 @@ public class BillDTO {
     this.billingDate = billingDate;
   }
 
-  public int getParts() {
+  public double getParts() {
     return parts;
   }
 
-  public void setParts(int parts) {
+  public void setParts(double parts) {
     this.parts = parts;
   }
 

@@ -44,13 +44,18 @@ public class UsersApi {
   }
 
   @PostMapping(value = {"/users"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
-  public User createUser(@RequestBody UserDTO userDTO) {
+  public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO) {
     User user = new User();
+    if (userRepository.findByEmail(userDTO.getEmail()) != null) {
+      // Email already registered! Return error status
+      // with empty user object because client handling is problematic else
+      return new ResponseEntity<>(user, HttpStatus.PRECONDITION_FAILED);
+    }
     user.setUsername(userDTO.getUsername());
     user.setEmail(userDTO.getEmail());
     user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
     user.setActive(true); //TODO: verify Email
-    return userRepository.save(user);
+    return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
   }
 
   @DeleteMapping(value = "/users/{userId}")
@@ -90,6 +95,13 @@ public class UsersApi {
   @PreAuthorize("@securityService.userIsSameUser(principal, #userId)")
   public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
     Optional<User> userOptional = userRepository.findById(userId);
+    // Check if user wants to change it's current email. If yes, check if the new email
+    // is already registered and return an error status code if it is.
+    if (!userOptional.get().getEmail().equals(userDTO.getEmail())) {
+      if (userRepository.findByEmail(userDTO.getEmail()) != null) {
+        return new ResponseEntity<>(userOptional.get(), HttpStatus.PRECONDITION_FAILED);
+      }
+    }
     if (passwordEncoder.matches(userDTO.getPassword(), userOptional.get().getPassword())) {
       return new ResponseEntity<>(userOptional.map(user -> {
         user.setUsername(userDTO.getUsername());

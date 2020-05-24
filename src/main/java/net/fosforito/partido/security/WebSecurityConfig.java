@@ -12,8 +12,12 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -36,13 +40,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http.csrf().disable()
-        .exceptionHandling()
-        .authenticationEntryPoint(restAuthenticationEntryPoint)
+    http.cors() // by default uses a Bean by the name of corsConfigurationSource
         .and()
-        .authorizeRequests()
-        .antMatchers("/users").permitAll()
-        .anyRequest().authenticated()
+        .exceptionHandling().authenticationEntryPoint(restAuthenticationEntryPoint)
         .and()
         .formLogin()
         .successHandler(successHandler)
@@ -51,9 +51,24 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .logout() // default on /logout path
         .deleteCookies("JSESSIONID")
         .and()
+        .csrf().disable()
+        .authorizeRequests()
+        .antMatchers("/users").permitAll()
+        .anyRequest().authenticated()
+        .and()
         .rememberMe()
         .key("o#3vt9§q384tnzv%79384tz78t3*q7z983z&4894=)zvt783tt8&v") // secret for token generation
         .tokenValiditySeconds(31536000); // 1 year
+  }
+
+  @Bean
+  CorsConfigurationSource corsConfigurationSource() {
+    CorsConfiguration corsConfiguration = new CorsConfiguration().applyPermitDefaultValues();
+    corsConfiguration.setAllowCredentials(true);
+    corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "OPTIONS", "DELETE"));
+    UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+    source.registerCorsConfiguration("/**", corsConfiguration);
+    return source;
   }
 
   @Inject

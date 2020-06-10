@@ -11,6 +11,8 @@ public class BillDTO {
   @NotNull
   private String description;
 
+  private String category;
+
   @NotNull
   private double totalAmount;
 
@@ -26,11 +28,13 @@ public class BillDTO {
   }
 
   public BillDTO(@NotNull String description,
+                 String category,
                  @NotNull double totalAmount,
                  @NotNull Date billingDate,
                  @NotNull double parts,
                  List<SplitDTO> splits) {
     this.description = description;
+    this.category = category;
     this.totalAmount = totalAmount;
     this.billingDate = billingDate;
     this.parts = parts;
@@ -43,6 +47,14 @@ public class BillDTO {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   public double getTotalAmount() {

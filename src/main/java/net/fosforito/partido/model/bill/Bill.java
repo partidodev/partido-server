@@ -28,6 +28,8 @@ public class Bill implements Comparable {
   @NotNull
   private String description;
 
+  private String category;
+
   @NotNull
   private double totalAmount;
 
@@ -62,6 +64,7 @@ public class Bill implements Comparable {
   }
 
   public Bill(@NotNull String description,
+              String category,
               @NotNull double totalAmount,
               @NotNull double parts,
               @NotNull Date billingDate,
@@ -70,6 +73,7 @@ public class Bill implements Comparable {
               User creator,
               List<Split> splits) {
     this.description = description;
+    this.category = category;
     this.totalAmount = totalAmount;
     this.parts = parts;
     this.billingDate = billingDate;
@@ -94,6 +98,14 @@ public class Bill implements Comparable {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public String getCategory() {
+    return category;
+  }
+
+  public void setCategory(String category) {
+    this.category = category;
   }
 
   public double getTotalAmount() {

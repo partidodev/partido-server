@@ -55,6 +55,7 @@ public class BillsApi {
     if (groupOptional.isPresent()) {
       Bill bill = new Bill(
               billDTO.getDescription(),
+              billDTO.getCategory(),
               billDTO.getTotalAmount(),
               billDTO.getParts(),
               billDTO.getBillingDate(),
@@ -75,6 +76,7 @@ public class BillsApi {
     if (billOptional.isPresent()) {
       return new ResponseEntity<>(billOptional.map(bill -> {
         bill.setDescription(billDTO.getDescription());
+        bill.setCategory(billDTO.getCategory());
         bill.setTotalAmount(billDTO.getTotalAmount());
         bill.setParts(billDTO.getParts());
         bill.setBillingDate(billDTO.getBillingDate());

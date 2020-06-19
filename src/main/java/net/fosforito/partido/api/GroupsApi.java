@@ -5,6 +5,8 @@ import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,20 +25,25 @@ import java.util.Optional;
 @RestController
 public class GroupsApi {
 
+  private static final Logger LOGGER = LoggerFactory.getLogger(GroupsApi.class);
+
   private final GroupRepository groupRepository;
   private final UserRepository userRepository;
   private final GroupService groupService;
   private final CurrentUserContext currentUserContext;
+  private final HttpServletRequest request;
 
   @Inject
   public GroupsApi(GroupRepository groupRepository,
                    UserRepository userRepository,
                    GroupService groupService,
-                   CurrentUserContext currentUserContext) {
+                   CurrentUserContext currentUserContext,
+                   HttpServletRequest request) {
     this.groupRepository = groupRepository;
     this.userRepository = userRepository;
     this.groupService = groupService;
     this.currentUserContext = currentUserContext;
+    this.request = request;
   }
 
   // Groups
@@ -127,8 +135,8 @@ public class GroupsApi {
    * - Returns status code 304 (not modified) if user is already in the group, returns the group object.
    * - Returns status code 200 (ok) if user has been added to group successfully, returns the updated group object.
    * - Returns status code 403 (forbidden) if group's join mode is inactive or invalid join key was provided.
-   * @param groupId ID of group to jin
-   * @param groupJoinBodyDTO conatins the id of user who wants to join group and the group key
+   * @param groupId ID of group to join
+   * @param groupJoinBodyDTO contains the id of user who wants to join group and the group key
    * @return Status code and group object as described above
    */
   @PostMapping(value = "/groups/{groupId}/join", produces = MediaType.APPLICATION_JSON)
@@ -158,6 +166,7 @@ public class GroupsApi {
       groupRepository.save(group);
       return new ResponseEntity<>(group, HttpStatus.OK);
     } else {
+      LOGGER.warn("Join group attempt for ip {} failed", getClientIP());
       return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
   }
@@ -212,5 +221,13 @@ public class GroupsApi {
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public Report getGroupReport(@PathVariable Long groupId) {
     return groupService.createActualGroupReport(groupId);
+  }
+
+  public String getClientIP() {
+    String xfHeader = request.getHeader("X-Forwarded-For");
+    if (xfHeader == null){
+      return request.getRemoteAddr();
+    }
+    return xfHeader.split(",")[0];
   }
 }

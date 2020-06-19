@@ -22,6 +22,7 @@ import java.util.Set;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
+  public static final String TOO_MANY_FAILED_LOGIN_ATTEMPTS = "Too many failed login attempts. Blocked for 15 minutes.";
 
   private final UserRepository userRepository;
   private final LoginAttemptService loginAttemptService;
@@ -41,7 +42,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     String ip = getClientIP();
     if (loginAttemptService.isBlocked(ip)) {
       LOGGER.warn("{} has been blocked after entering 3 wrong passwords in 15 minutes", ip);
-      throw new RuntimeException("An ip has been blocked temporarily");
+      throw new RuntimeException(TOO_MANY_FAILED_LOGIN_ATTEMPTS);
     }
 
     User user = userRepository.findByEmail(email);
@@ -57,7 +58,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), grantedAuthorities);
   }
 
-  private String getClientIP() {
+  public String getClientIP() {
     String xfHeader = request.getHeader("X-Forwarded-For");
     if (xfHeader == null){
       return request.getRemoteAddr();

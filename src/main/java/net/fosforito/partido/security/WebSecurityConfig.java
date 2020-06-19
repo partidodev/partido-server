@@ -11,7 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -26,8 +26,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final UserDetailsServiceImpl userDetailsService;
   private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
   private final MySavedRequestAwareAuthenticationSuccessHandler successHandler;
-
-  private SimpleUrlAuthenticationFailureHandler failureHandler = new SimpleUrlAuthenticationFailureHandler();
 
   @Inject
   public WebSecurityConfig(UserDetailsServiceImpl userDetailsService,
@@ -46,7 +44,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .formLogin()
         .successHandler(successHandler)
-        .failureHandler(failureHandler)
+        .failureHandler(customAuthenticationFailureHandler())
         .and()
         .logout() // default on /logout path
         .deleteCookies("JSESSIONID")
@@ -80,6 +78,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   public AuthenticationManager authenticationManagerBean() throws Exception {
     return super.authenticationManagerBean();
+  }
+
+  @Bean
+  public AuthenticationFailureHandler customAuthenticationFailureHandler() {
+    return new CustomAuthenticationFailureHandler();
   }
 
   @Bean

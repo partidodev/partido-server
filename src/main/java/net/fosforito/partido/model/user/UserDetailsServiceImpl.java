@@ -41,7 +41,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
     String ip = getClientIP();
     if (loginAttemptService.isBlocked(ip)) {
-      LOGGER.warn("{} has been blocked after entering 3 wrong passwords in 15 minutes", ip);
+      LOGGER.warn("{} has been blocked after entering 3 wrong passwords in 5 minutes", ip);
       throw new RuntimeException(TOO_MANY_FAILED_LOGIN_ATTEMPTS);
     }
 

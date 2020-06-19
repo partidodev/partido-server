@@ -29,7 +29,7 @@ public class LoginAttemptService {
 
   public LoginAttemptService() {
     super();
-    attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(15, TimeUnit.MINUTES).build(new CacheLoader<String, Integer>() {
+    attemptsCache = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build(new CacheLoader<String, Integer>() {
       @Override
       public Integer load(final String key) {
         return 0;

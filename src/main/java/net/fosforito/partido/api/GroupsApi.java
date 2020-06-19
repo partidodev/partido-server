@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -72,6 +72,7 @@ public class GroupsApi {
     group.setCurrency(groupDTO.getCurrency());
     group.setJoinModeActive(groupDTO.isJoinModeActive());
     group.setJoinKey(groupDTO.getJoinKey());
+    group.setCreationDate(new Date());
     group.setFounder(founder);
     group.setUsers(userList);
     return groupRepository.save(group);

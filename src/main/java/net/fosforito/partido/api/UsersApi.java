@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
+import java.util.Date;
 import java.util.Optional;
 
 @RestController
@@ -54,6 +55,7 @@ public class UsersApi {
     user.setUsername(userDTO.getUsername());
     user.setEmail(userDTO.getEmail());
     user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
+    user.setRegistrationDate(new Date());
     user.setActive(true); //TODO: verify Email
     return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
   }

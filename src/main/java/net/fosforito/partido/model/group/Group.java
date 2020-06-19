@@ -1,12 +1,10 @@
 package net.fosforito.partido.model.group;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.fasterxml.jackson.annotation.*;
 import net.fosforito.partido.model.user.User;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
@@ -35,6 +33,10 @@ public class Group {
 
   private String joinKey;
 
+  @NotNull
+  @JsonIgnore
+  private Date creationDate;
+
   @ManyToOne
   @NotNull
   @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
@@ -61,6 +63,7 @@ public class Group {
           @NotNull String currency,
           @NotNull boolean joinModeActive,
           String joinKey,
+          @NotNull Date creationDate,
           @NotNull User founder, List<User> users
   ) {
     this.name = name;
@@ -68,6 +71,7 @@ public class Group {
     this.currency = currency;
     this.joinModeActive = joinModeActive;
     this.joinKey = joinKey;
+    this.creationDate = creationDate;
     this.founder = founder;
     this.users = users;
   }
@@ -118,6 +122,14 @@ public class Group {
 
   public void setJoinKey(String joinKey) {
     this.joinKey = joinKey;
+  }
+
+  public Date getCreationDate() {
+    return creationDate;
+  }
+
+  public void setCreationDate(Date creationDate) {
+    this.creationDate = creationDate;
   }
 
   public User getFounder() {

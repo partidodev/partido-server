@@ -34,8 +34,10 @@ public class User {
   @JsonIgnore
   private Date registrationDate;
 
+  private boolean emailVerified;
+
   @JsonIgnore
-  private Boolean active;
+  private String emailVerificationCode;
 
   @ManyToMany
   @JsonIgnore
@@ -44,12 +46,13 @@ public class User {
   public User() {
   }
 
-  public User(String username, String email, String password, Date registrationDate, Boolean active) {
+  public User(String username, String email, String password, Date registrationDate, boolean emailVerified, String emailVerificationCode) {
     this.username = username;
     this.email = email;
     this.password = password;
     this.registrationDate = registrationDate;
-    this.active = active;
+    this.emailVerified = emailVerified;
+    this.emailVerificationCode = emailVerificationCode;
   }
 
   public Long getId() {
@@ -92,12 +95,20 @@ public class User {
     this.registrationDate = registrationDate;
   }
 
-  public Boolean getActive() {
-    return active;
+  public boolean isEmailVerified() {
+    return emailVerified;
   }
 
-  public void setActive(Boolean active) {
-    this.active = active;
+  public void setEmailVerified(boolean emailVerified) {
+    this.emailVerified = emailVerified;
+  }
+
+  public String getEmailVerificationCode() {
+    return emailVerificationCode;
+  }
+
+  public void setEmailVerificationCode(String emailVerificationCode) {
+    this.emailVerificationCode = emailVerificationCode;
   }
 
   public Set<Role> getRoles() {

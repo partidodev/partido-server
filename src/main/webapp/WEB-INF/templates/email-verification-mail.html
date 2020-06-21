@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        body {
+            font-size: 14px;
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: sans-serif;
+        }
+        #header {
+            text-align: center; background-color: #4caf50; padding: 20px;
+        }
+        #content {
+            padding: 20px;
+        }
+        #footer {
+            text-align: center;
+            background-color: #4caf50;
+            padding: 5px;
+            color: white;
+            font-size: 12px;
+        }
+        #footer a {
+            color: white;
+            text-decoration: none;
+        }
+        #footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <img src="cid:logo.png" alt="Partido Logo" style="height: 35px;"/>
+    </div>
+    <div id="content">
+        <p>Hi <span th:text="${username}"></span>,</p>
+        <p>Welcome to Partido! To start splitting costs with your friends, you need to verify that this email is yours.</p>
+        <p>Copy the following code and use it in the Partido App to verify your account:</p>
+        <p><b th:text="${verificationLink}"></b></p>
+        <p>If you did not sign up with Partido, please just ignore this email.</p>
+        <p>Regards,</p>
+        <p><em>Jens Wagner @ Partido</em></p>
+    </div>
+    <div id="footer">
+        <a href="https://partido.rocks/">Homepage</a> |
+        <a href="https://partido.rocks/imprint/">Imprint</a> |
+        <a href="https://partido.rocks/privacy/">Privacy Policy</a> |
+        <a href="https://partido.rocks/contact/">Contact</a>
+    </div>
+</body>
+</html>

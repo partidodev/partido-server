@@ -22,14 +22,18 @@ import java.util.Set;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
-  public static final String TOO_MANY_FAILED_LOGIN_ATTEMPTS = "Too many failed login attempts. Blocked for 15 minutes.";
+  public static final String TOO_MANY_FAILED_LOGIN_ATTEMPTS = "Too many failed login attempts. Blocked for 5 minutes.";
+  public static final String ACCOUNT_NOT_VERIFIED = "This account has not been verified yet.";
 
   private final UserRepository userRepository;
   private final LoginAttemptService loginAttemptService;
   private final HttpServletRequest request;
 
   @Inject
-  public UserDetailsServiceImpl(UserRepository userRepository, LoginAttemptService loginAttemptService, HttpServletRequest request) {
+  public UserDetailsServiceImpl(
+      UserRepository userRepository,
+      LoginAttemptService loginAttemptService,
+      HttpServletRequest request) {
     this.userRepository = userRepository;
     this.loginAttemptService = loginAttemptService;
     this.request = request;
@@ -46,6 +50,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     User user = userRepository.findByEmail(email);
+
+    if (!user.isEmailVerified()) {
+      LOGGER.warn("Account {} has not been verified, login attempt cancelled", ip);
+      throw new RuntimeException(ACCOUNT_NOT_VERIFIED);
+    }
 
     Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
 

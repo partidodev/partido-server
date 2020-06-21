@@ -1,5 +1,6 @@
 package net.fosforito.partido.api;
 
+import net.fosforito.partido.mail.EmailService;
 import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserDTO;
@@ -14,8 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class UsersApi {
@@ -23,14 +23,17 @@ public class UsersApi {
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final CurrentUserContext currentUserContext;
+  private final EmailService emailService;
 
   @Inject
   public UsersApi(UserRepository userRepository,
                   PasswordEncoder passwordEncoder,
-                  CurrentUserContext currentUserContext) {
+                  CurrentUserContext currentUserContext,
+                  EmailService emailService) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.currentUserContext = currentUserContext;
+    this.emailService = emailService;
   }
 
   @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON)
@@ -52,12 +55,19 @@ public class UsersApi {
       // with empty user object because client handling is problematic else
       return new ResponseEntity<>(user, HttpStatus.PRECONDITION_FAILED);
     }
+    String emailVerificationCode = UUID.randomUUID().toString();
     user.setUsername(userDTO.getUsername());
     user.setEmail(userDTO.getEmail());
     user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
     user.setRegistrationDate(new Date());
-    user.setActive(true); //TODO: verify Email
-    return new ResponseEntity<>(userRepository.save(user), HttpStatus.OK);
+    user.setEmailVerified(false); //verify Email to activate account
+    user.setEmailVerificationCode(emailVerificationCode);
+    User savedUser = userRepository.save(user);
+    Map<String, Object> templateModel = new HashMap<>();
+    templateModel.put("username", userDTO.getUsername());
+    templateModel.put("verificationLink", "https://partido.rocks/api/users/" + savedUser.getId() + "/verify/" + emailVerificationCode);
+    emailService.sendEmailVerificationMail(userDTO.getEmail(), templateModel);
+    return new ResponseEntity<>(savedUser, HttpStatus.OK);
   }
 
   @DeleteMapping(value = "/users/{userId}")

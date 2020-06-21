@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Norican&display=swap');
+        body {
+            font-size: 14px;
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: sans-serif;
+        }
+        #header {
+            text-align: center; background-color: #4caf50; padding: 20px;
+        }
+        #header .logo {
+            font-family: 'Norican', cursive;
+            font-size: 35px;
+            color: white;
+        }
+        #content {
+            padding: 20px;
+        }
+        #footer {
+            text-align: center;
+            background-color: #4caf50;
+            padding: 5px;
+            color: white;
+            font-size: 12px;
+        }
+        #footer a {
+            color: white;
+            text-decoration: none;
+        }
+        #footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div id="header">
+    <span class="logo">Partido</span>
+</div>
+<div id="content">
+    <h2>Account verification status</h2>
+    <p th:if="${username != null}">Hi <span th:text="${username}"></span>,</p>
+    <p th:if="${username == null}">Hi,</p>
+    <p th:text="${message}"></p>
+    <p>Regards,</p>
+    <p><em>Jens Wagner @ Partido</em></p>
+</div>
+<div id="footer">
+    <a href="https://partido.rocks/">Homepage</a> |
+    <a href="https://partido.rocks/imprint/">Imprint</a> |
+    <a href="https://partido.rocks/privacy/">Privacy Policy</a> |
+    <a href="https://partido.rocks/contact/">Contact</a>
+</div>
+</body>
+</html>

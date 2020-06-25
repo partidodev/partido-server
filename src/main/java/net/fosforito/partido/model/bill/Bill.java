@@ -27,6 +27,7 @@ public class Bill implements Comparable {
   @NotNull
   private String description;
 
+  @NotNull
   private String category;
 
   @NotNull
@@ -63,7 +64,7 @@ public class Bill implements Comparable {
   }
 
   public Bill(@NotNull String description,
-              String category,
+              @NotNull String category,
               @NotNull double totalAmount,
               @NotNull double parts,
               @NotNull Date billingDate,

@@ -11,6 +11,7 @@ public class BillDTO {
   @NotNull
   private String description;
 
+  @NotNull
   private String category;
 
   @NotNull
@@ -28,7 +29,7 @@ public class BillDTO {
   }
 
   public BillDTO(@NotNull String description,
-                 String category,
+                 @NotNull String category,
                  @NotNull double totalAmount,
                  @NotNull Date billingDate,
                  @NotNull double parts,

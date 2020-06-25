@@ -34,6 +34,7 @@ public class User {
   @JsonIgnore
   private Date registrationDate;
 
+  @JsonIgnore
   private boolean emailVerified;
 
   @JsonIgnore

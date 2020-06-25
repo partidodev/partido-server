@@ -41,7 +41,11 @@
         <p>Hi <span th:text="${username}"></span>,</p>
         <p>Welcome to Partido! To start splitting costs with your friends, you need to verify that this email is yours.</p>
         <p>Copy the following code and use it in the Partido App to verify your account:</p>
-        <p><b th:text="${verificationLink}"></b></p>
+        <p>
+            <a th:href="@{${verificationLink}}">
+                <b th:text="${verificationLink}"></b>
+            </a>
+        </p>
         <p>If you did not sign up with Partido, please just ignore this email.</p>
         <p>Regards,</p>
         <p><em>Jens Wagner @ Partido</em></p>

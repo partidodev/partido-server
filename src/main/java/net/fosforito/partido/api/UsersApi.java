@@ -86,10 +86,10 @@ public class UsersApi {
 
   /**
    * ADMIN only
-   *
+   * <p>
    * To see user details from a group member, the users shipped
    * with the getGroup-Request should be used.
-   *
+   * <p>
    * To see own user's details, the /currentuser endpoint should be used
    *
    * @param userId ID of the user to be fetched
@@ -100,21 +100,24 @@ public class UsersApi {
   public ResponseEntity<User> getUser(@PathVariable Long userId) {
     Optional<User> userOptional = userRepository.findById(userId);
     return userOptional.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
-            .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
+        .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
   }
 
   @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userIsSameUser(principal, #userId)")
   public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
     Optional<User> userOptional = userRepository.findById(userId);
-    // Check if user wants to change it's current email. If yes, check if the new email
+    // Check if user wants to change it's current email address. If yes, check if the new one
     // is already registered and return an error status code if it is.
-    if (!userOptional.get().getEmail().equals(userDTO.getEmail())) {
+    if (userOptional.isPresent()
+        && !userOptional.get().getEmail().equals(userDTO.getEmail())) {
       if (userRepository.findByEmail(userDTO.getEmail()) != null) {
         return new ResponseEntity<>(userOptional.get(), HttpStatus.PRECONDITION_FAILED);
       }
     }
-    if (passwordEncoder.matches(userDTO.getPassword(), userOptional.get().getPassword())) {
+    // Allow email changes only when user enters his password correctly
+    if (userOptional.isPresent()
+        && passwordEncoder.matches(userDTO.getPassword(), userOptional.get().getPassword())) {
       return new ResponseEntity<>(userOptional.map(user -> {
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
@@ -124,6 +127,8 @@ public class UsersApi {
         return userRepository.save(user);
       }).get(), HttpStatus.OK);
     }
-    return new ResponseEntity<>(userOptional.get(), HttpStatus.NOT_MODIFIED);
+    // If nothing has changed, just return the current user if found
+    return userOptional.map(user -> new ResponseEntity<>(user, HttpStatus.NOT_MODIFIED))
+        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
   }
 }

@@ -20,6 +20,10 @@ import java.util.*;
 @RestController
 public class UsersApi {
 
+  public static final String PARTIDO_API_BASE = "https://partido.rocks/api/";
+  public static final String USERS_API_PATH = "users/";
+  public static final String VERIFY_PATH = "/verify/";
+
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final CurrentUserContext currentUserContext;
@@ -65,7 +69,8 @@ public class UsersApi {
     User savedUser = userRepository.save(user);
     Map<String, Object> templateModel = new HashMap<>();
     templateModel.put("username", userDTO.getUsername());
-    templateModel.put("verificationLink", "https://partido.rocks/api/users/" + savedUser.getId() + "/verify/" + emailVerificationCode);
+    templateModel.put("verificationLink",
+        PARTIDO_API_BASE + USERS_API_PATH + savedUser.getId() + VERIFY_PATH + emailVerificationCode);
     emailService.sendEmailVerificationMail(userDTO.getEmail(), templateModel);
     return new ResponseEntity<>(savedUser, HttpStatus.OK);
   }
@@ -106,27 +111,43 @@ public class UsersApi {
   @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userIsSameUser(principal, #userId)")
   public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
+
     Optional<User> userOptional = userRepository.findById(userId);
-    // Check if user wants to change it's current email address. If yes, check if the new one
-    // is already registered and return an error status code if it is.
-    if (userOptional.isPresent()
-        && !userOptional.get().getEmail().equals(userDTO.getEmail())) {
-      if (userRepository.findByEmail(userDTO.getEmail()) != null) {
-        return new ResponseEntity<>(userOptional.get(), HttpStatus.PRECONDITION_FAILED);
-      }
+    boolean userEmailChanged = userOptional.isPresent() && !userOptional.get().getEmail().equals(userDTO.getEmail());
+
+    // Check if user wants to change it's current email address and if the new one
+    // is already registered. Return an error status code if it is.
+    if (userEmailChanged && userRepository.findByEmail(userDTO.getEmail()) != null) {
+      return new ResponseEntity<>(userOptional.get(), HttpStatus.PRECONDITION_FAILED);
     }
-    // Allow email changes only when user enters his password correctly
-    if (userOptional.isPresent()
-        && passwordEncoder.matches(userDTO.getPassword(), userOptional.get().getPassword())) {
+
+    // Allow account changes only when user enters his password correctly
+    if (userOptional.isPresent() && passwordEncoder.matches(userDTO.getPassword(), userOptional.get().getPassword())) {
+      // Resend a verification mail to user if the email address has been changed.
+      String emailVerificationCode = UUID.randomUUID().toString();
+      if (userEmailChanged) {
+        Map<String, Object> templateModel = new HashMap<>();
+        templateModel.put("username", userDTO.getUsername());
+        templateModel.put("verificationLink",
+            PARTIDO_API_BASE + USERS_API_PATH + userOptional.get().getId() + VERIFY_PATH + emailVerificationCode);
+        emailService.sendEmailVerificationMail(userDTO.getEmail(), templateModel);
+      }
       return new ResponseEntity<>(userOptional.map(user -> {
         user.setUsername(userDTO.getUsername());
         user.setEmail(userDTO.getEmail());
+        // If the email address has been changed, change verification details in user's entity
+        if (userEmailChanged) {
+          user.setEmailVerificationCode(emailVerificationCode);
+          user.setEmailVerified(false);
+        }
+        // If a new password has been provided and it is valid, save it
         if (userDTO.getNewPassword() != null && userDTO.getNewPassword().length() > 6) {
           user.setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
         }
         return userRepository.save(user);
       }).get(), HttpStatus.OK);
     }
+
     // If nothing has changed, just return the current user if found
     return userOptional.map(user -> new ResponseEntity<>(user, HttpStatus.NOT_MODIFIED))
         .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));

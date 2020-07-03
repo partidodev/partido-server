@@ -51,7 +51,9 @@ public class HtmlEndpoints {
       title = "Account verified";
       message = "Your account has been verified successfully! Now you can start using the Partido App.";
       templateModel.put("username", userOptional.get().getUsername());
-    } else if (userOptional.isPresent() && userOptional.get().isEmailVerified()) {
+    } else if (userOptional.isPresent()
+        && userOptional.get().isEmailVerified()
+        && userOptional.get().getEmailVerificationCode().equals(verificationCode)) {
       title = "Account already verified";
       message = "Your account has already been verified! You can start using the Partido App.";
       templateModel.put("username", userOptional.get().getUsername());

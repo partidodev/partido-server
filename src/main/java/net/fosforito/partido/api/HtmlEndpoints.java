@@ -39,17 +39,27 @@ public class HtmlEndpoints {
   public String verifyUserEmail(@PathVariable Long userId, @PathVariable String verificationCode) {
     Optional<User> userOptional = userRepository.findById(userId);
     Map<String, Object> templateModel = new HashMap<>();
+    String title;
     String message;
-    if (userOptional.isPresent() && userOptional.get().getEmailVerificationCode().equals(verificationCode)) {
+    if (userOptional.isPresent()
+        && !userOptional.get().isEmailVerified()
+        && userOptional.get().getEmailVerificationCode().equals(verificationCode)) {
       userOptional.map(user -> {
         user.setEmailVerified(true);
         return userRepository.save(user);
       });
+      title = "Account verified";
       message = "Your account has been verified successfully! Now you can start using the Partido App.";
       templateModel.put("username", userOptional.get().getUsername());
+    } else if (userOptional.isPresent() && userOptional.get().isEmailVerified()) {
+      title = "Account already verified";
+      message = "Your account has already been verified! You can start using the Partido App.";
+      templateModel.put("username", userOptional.get().getUsername());
     } else {
-      message = "Invalid verification details provided. Account cannot be verified.";
+      title = "Account verification failed";
+      message = "Invalid verification details provided. Account cannot be verified. If you think, that's an error, please contact us.";
     }
+    templateModel.put("title", title);
     templateModel.put("message", message);
     Context thymeleafContext = new Context();
     thymeleafContext.setVariables(templateModel);

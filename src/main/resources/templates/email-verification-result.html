@@ -45,7 +45,7 @@
     <span class="logo">Partido</span>
 </div>
 <div id="content">
-    <h2>Account verification status</h2>
+    <h2 th:text="${title}"></h2>
     <p th:if="${username != null}">Hi <span th:text="${username}"></span>,</p>
     <p th:if="${username == null}">Hi,</p>
     <p th:text="${message}"></p>

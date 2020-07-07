@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +51,9 @@ public class GroupService {
           if (split.getDebtor().equals(user)) {
             balanceAmount = balanceAmount.add(
                 split.getPaid().subtract(
-                    bill.getTotalAmount().divide(bill.getParts()).multiply(split.getPartsOfBill())
+                    bill.getTotalAmount()
+                        .divide(bill.getParts(), 5, RoundingMode.HALF_UP)
+                        .multiply(split.getPartsOfBill())
                 )
             );
           }

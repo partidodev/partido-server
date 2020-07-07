@@ -18,7 +18,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class BillsApi {
@@ -39,14 +43,26 @@ public class BillsApi {
     this.currentUserContext = currentUserContext;
   }
 
+  /**
+   * Get all open bills of a specific group
+   * @param groupId ID of the group toget all open billls for
+   * @return List with bill objects
+   */
   @GetMapping(value = "/groups/{groupId}/bills", produces = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public List<Bill> getAllBillsForGroup(@PathVariable Long groupId) {
-    List<Bill> bills = billRepository.findAllByGroupId(groupId);
+    List<Bill> bills = billRepository.findAllByGroupIdAndClosed(groupId, false);
     bills.sort(Collections.reverseOrder(null));
     return bills;
   }
 
+
+  /**
+   * Create a new bill object in a specific group.
+   * @param billDTO object containing all information about the new bill
+   * @param groupId ID of the group to create a new bill object in
+   * @return newly created bill object
+   */
   @PostMapping(value = "/groups/{groupId}/bills", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public ResponseEntity<Bill> createBillForGroup(@RequestBody BillDTO billDTO, @PathVariable Long groupId) {
@@ -68,9 +84,16 @@ public class BillsApi {
     return new ResponseEntity<>(HttpStatus.NOT_FOUND);
   }
 
+  /**
+   * Update a bill with specific ID in a group with specific ID.
+   * @param groupId ID of the group where the bill is located in.
+   * @param billId ID of the bill to update
+   * @param billDTO object containing updated information about the bill
+   * @return updated bill object if succeeded
+   */
   @PutMapping(value = "/groups/{groupId}/bills/{billId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
-  public ResponseEntity<Bill> updateBill(@PathVariable Long groupId, @PathVariable Long billId, @RequestBody BillDTO billDTO) throws Exception {
+  public ResponseEntity<Bill> updateBill(@PathVariable Long groupId, @PathVariable Long billId, @RequestBody BillDTO billDTO) {
     Optional<Bill> billOptional = billRepository.findById(billId);
     if (billOptional.isPresent()) {
       return new ResponseEntity<>(billOptional.map(bill -> {
@@ -86,6 +109,11 @@ public class BillsApi {
     return ResponseEntity.notFound().build();
   }
 
+  /**
+   * Get a single bill object with specific ID
+   * @param billId ID of the bill to get
+   * @return bill object
+   */
   @GetMapping(value = "/bills/{billId}", produces = MediaType.APPLICATION_JSON)
   @PostAuthorize("@securityService.userCanReadGroup(principal, returnObject.body.group.id)")
   public ResponseEntity<Bill> getBill(@PathVariable Long billId) {
@@ -94,6 +122,12 @@ public class BillsApi {
             .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
+  /**
+   * Delete a bill with specific ID
+   * @param billId ID of the bill to delete
+   * @return HTTP Status 200 (OK) if succeeded or 404 (Not found) if not
+   * @throws Exception with error description
+   */
   @DeleteMapping(value = "/bills/{billId}")
   @PreAuthorize("@securityService.userCanDeleteBill(principal, #billId)")
   public ResponseEntity<?> deleteBill(@PathVariable Long billId) throws Exception {
@@ -104,6 +138,11 @@ public class BillsApi {
             }).orElseThrow(() -> new Exception("Bill not found with id " + billId));
   }
 
+  /**
+   * Intern method to convert splitDTO objects to split objects
+   * @param splitDTOs List with splitDTO objects
+   * @return List with split objects
+   */
   private List<Split> convertToSplits(List<SplitDTO> splitDTOs) {
     List<Split> splits = new ArrayList<>();
     for (SplitDTO splitDTO : splitDTOs) {

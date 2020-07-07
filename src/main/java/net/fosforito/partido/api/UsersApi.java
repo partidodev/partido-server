@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
-import java.util.*;
+import java.util.Date;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.Optional;
+import java.util.UUID;
 
 @RestController
 public class UsersApi {
@@ -38,11 +42,21 @@ public class UsersApi {
     this.emailService = emailService;
   }
 
+  /**
+   * Get information "about me", the currently signed in user.
+   * @return User object with profile details.
+   */
   @GetMapping(value = "/currentuser", produces = MediaType.APPLICATION_JSON)
   public User getCurrentUser() {
     return currentUserContext.getCurrentUser();
   }
 
+  /**
+   * Open REST endpoint for all users (signed in or not).
+   * Used to register new user accounts.
+   * @param userDTO object with details of the user to be created
+   * @return newly created user object
+   */
   @PostMapping(value = {"/users"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO) {
     User user = new User();
@@ -81,6 +95,12 @@ public class UsersApi {
     return ResponseEntity.notFound().build();
   }
 
+  /**
+   * Update own user profile.
+   * @param userId ID of the user to be updated
+   * @param userDTO User object containing updated profile details
+   * @return updated User object
+   */
   @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userIsSameUser(principal, #userId)")
   public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserDTO userDTO) {

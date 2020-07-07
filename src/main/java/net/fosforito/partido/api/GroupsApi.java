@@ -44,8 +44,10 @@ public class GroupsApi {
     this.request = request;
   }
 
-  // Groups
-
+  /**
+   * This method returns a list of all groups, a user has access to.
+   * @return List with group objects
+   */
   @GetMapping(
       value = "/currentusergroups",
       produces = MediaType.APPLICATION_JSON
@@ -54,6 +56,11 @@ public class GroupsApi {
     return groupRepository.findAllByUsersIsContaining(currentUserContext.getCurrentUser());
   }
 
+  /**
+   * Create a new group.
+   * @param groupDTO object with information about the new group
+   * @return newly created group object as confirmation
+   */
   @PostMapping(
       value = "/groups",
       produces = MediaType.APPLICATION_JSON,
@@ -75,13 +82,19 @@ public class GroupsApi {
     return groupRepository.save(group);
   }
 
+  /**
+   * Change a single group's settings
+   * @param groupId ID of the group to change settings of
+   * @param groupDTO object with updated group settings
+   * @return updated group object if succeeded
+   */
   @PutMapping(
       value = "/groups/{groupId}",
       produces = MediaType.APPLICATION_JSON,
       consumes = MediaType.APPLICATION_JSON
   )
   @PreAuthorize("@securityService.userCanUpdateGroup(principal, #groupId)")
-  public ResponseEntity<Group> updateGroup(@PathVariable Long groupId, @RequestBody GroupDTO groupDTO) throws Exception {
+  public ResponseEntity<Group> updateGroup(@PathVariable Long groupId, @RequestBody GroupDTO groupDTO) {
     Optional<Group> groupOptional = groupRepository.findById(groupId);
     if (groupOptional.isPresent()) {
       return new ResponseEntity<>(groupOptional.map(group -> {
@@ -96,6 +109,12 @@ public class GroupsApi {
     return ResponseEntity.notFound().build();
   }
 
+  /**
+   * Get all information about a single group where the requesting user has access to.
+   * Information includes a list of all other users in the same  group.
+   * @param groupId ID of the group to get information for
+   * @return group object with users list and other information
+   */
   @GetMapping(
       value = "/groups/{groupId}",
       produces = MediaType.APPLICATION_JSON
@@ -110,7 +129,8 @@ public class GroupsApi {
   @DeleteMapping(value = "/groups/{groupId}")
   @PreAuthorize("@securityService.userIsFounderOfGroup(principal, #groupId)")
   public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) throws Exception {
-    //TODO: make sure to delete all bills and user-group relations but no user accounts
+    //TODO: make sure to delete all bills with splits and user-group relations but no user accounts
+    //TODO: but first make sure balances are zero
     return groupRepository.findById(groupId)
         .map(group -> {
           groupRepository.delete(group);
@@ -133,6 +153,7 @@ public class GroupsApi {
 
     Optional<Group> optionalGroup = groupRepository.findById(groupId);
     Optional<User> optionalUser = userRepository.findById(groupJoinBodyDTO.getUserId());
+
     Group group;
     User user;
 
@@ -171,6 +192,11 @@ public class GroupsApi {
     return groupService.createActualGroupReport(groupId);
   }
 
+  /**
+   * Get the IP address of the current user.
+   * If possible, use the X-Forwarded-For header set when server runs behind a proxy.
+   * @return client's IP as String
+   */
   public String getClientIP() {
     String xfHeader = request.getHeader("X-Forwarded-For");
     if (xfHeader == null){

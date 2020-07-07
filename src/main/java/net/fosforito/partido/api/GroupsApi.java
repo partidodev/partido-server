@@ -1,5 +1,6 @@
 package net.fosforito.partido.api;
 
+import net.fosforito.partido.model.checkout.CheckoutReport;
 import net.fosforito.partido.model.group.*;
 import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.user.CurrentUserContext;
@@ -190,6 +191,12 @@ public class GroupsApi {
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public Report getGroupReport(@PathVariable Long groupId) {
     return groupService.createActualGroupReport(groupId);
+  }
+
+  @PostMapping(value = "/groups/{groupId}/checkout")
+  @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
+  public CheckoutReport checkoutGroup(@PathVariable Long groupId) {
+    return groupService.checkoutGroup(groupId);
   }
 
   /**

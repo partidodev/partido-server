@@ -1,6 +1,5 @@
 package net.fosforito.partido.model.group;
 
-import net.fosforito.partido.api.GroupsApi;
 import net.fosforito.partido.model.bill.Bill;
 import net.fosforito.partido.model.bill.BillRepository;
 import net.fosforito.partido.model.checkout.CheckoutReport;
@@ -19,7 +18,6 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -38,6 +36,12 @@ public class GroupService {
     this.groupRepository = groupRepository;
   }
 
+  /**
+   * Creates an overview list with current balances
+   * of all members in a specific group.
+   * @param groupId ID of the group to get balances for
+   * @return Report with balances
+   */
   public Report createActualGroupReport(Long groupId) {
     List<Bill> bills = billRepository.findAllByGroupIdAndClosed(groupId, false);
     List<User> users = groupRepository.findById(groupId).get().getUsers();
@@ -64,12 +68,17 @@ public class GroupService {
     return new Report(LocalDateTime.now(), balances);
   }
 
+  /**
+   * Checkout a specific group, close all current bills of the group and notify all group members
+   * about the checkout with tips on how to compensate all balances.
+   * @param groupId ID of the group to check out
+   * @return Report with checkout and compensation payment information
+   */
   //TODO: close checked out bills and send an email to all group members
   public CheckoutReport checkoutGroup(Long groupId) {
     List<Balance> currentGroupBalances = createActualGroupReport(groupId).getBalances();
     List<Balance> positiveBalances = new LinkedList<>();
     List<Balance> negativeBalances = new LinkedList<>();
-
     List<CompensationPayment> compensationPayments = new LinkedList<>();
 
     currentGroupBalances.forEach(balance -> {
@@ -82,8 +91,8 @@ public class GroupService {
     });
 
     Collections.sort(positiveBalances);
-    Collections.reverse(positiveBalances);
-    Collections.sort(negativeBalances);
+    Collections.reverse(positiveBalances); //descending (highest amounts first)
+    Collections.sort(negativeBalances); //ascending (lowest amount first)
 
     int positiveBalanceCounter = 0;
     BigDecimal positiveBalanceRest = positiveBalances.get(positiveBalanceCounter).getBalance();

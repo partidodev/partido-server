@@ -5,8 +5,6 @@ import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserDTO;
 import net.fosforito.partido.model.user.UserRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,12 +36,6 @@ public class UsersApi {
     this.passwordEncoder = passwordEncoder;
     this.currentUserContext = currentUserContext;
     this.emailService = emailService;
-  }
-
-  @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON)
-  @PreAuthorize("hasRole('ADMIN')")
-  public Page<User> getUsers(Pageable pageable) {
-    return userRepository.findAll(pageable);
   }
 
   @GetMapping(value = "/currentuser", produces = MediaType.APPLICATION_JSON)
@@ -87,25 +79,6 @@ public class UsersApi {
       });
     }
     return ResponseEntity.notFound().build();
-  }
-
-  /**
-   * ADMIN only
-   * <p>
-   * To see user details from a group member, the users shipped
-   * with the getGroup-Request should be used.
-   * <p>
-   * To see own user's details, the /currentuser endpoint should be used
-   *
-   * @param userId ID of the user to be fetched
-   * @return User object or null if not existing
-   */
-  @GetMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON)
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<User> getUser(@PathVariable Long userId) {
-    Optional<User> userOptional = userRepository.findById(userId);
-    return userOptional.map(user -> new ResponseEntity<>(user, HttpStatus.OK))
-        .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.NOT_FOUND));
   }
 
   @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)

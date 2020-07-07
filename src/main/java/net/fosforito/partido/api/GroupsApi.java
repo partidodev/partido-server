@@ -7,8 +7,6 @@ import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -47,15 +45,6 @@ public class GroupsApi {
   }
 
   // Groups
-
-  @GetMapping(
-      value = "/groups",
-      produces = MediaType.APPLICATION_JSON
-  )
-  @PreAuthorize("hasRole('ADMIN')")
-  public Page<Group> getGroups(Pageable pageable) {
-    return groupRepository.findAll(pageable);
-  }
 
   @GetMapping(
       value = "/currentusergroups",
@@ -169,47 +158,6 @@ public class GroupsApi {
       LOGGER.warn("Join group attempt for ip {} failed", getClientIP());
       return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
-  }
-
-  /**
-   * ADMIN only
-   *
-   * Not used by group members. Every user who wants to join a group, must join it explicitly with a joinKey.
-   *
-   * @param groupId ID of group where a user wants to join
-   * @param userId ID of user to join in group
-   * @return Group object with updated user list or old user list if user already is in group
-   * @throws Exception if user cannot be added to group
-   */
-  @PostMapping(value = "/groups/{groupId}/users/{userId}", produces = MediaType.APPLICATION_JSON)
-  @PreAuthorize("hasRole('ADMIN')")
-  public Group addUserToGroup(@PathVariable Long groupId, @PathVariable Long userId) throws Exception {
-    return groupRepository.findById(groupId).map(group -> {
-      List<User> groupUsers = group.getUsers();
-      for (User user : groupUsers) {
-        if (user.getId().equals(userId)) {
-          return group; // User already in group, just return the group as it is
-        }
-      }
-      groupUsers.add(userRepository.findById(userId).get());
-      group.setUsers(groupUsers);
-      return groupRepository.save(group);
-    }).orElseThrow(() -> new Exception("Cannot add user with id " + userId + " to group with id " + groupId));
-  }
-
-  /**
-   * ADMIN only
-   */
-  @DeleteMapping(value = "/groups/{groupId}/users/{userId}", produces = MediaType.APPLICATION_JSON)
-  @PreAuthorize("@securityService.userIsSameUserAndFromGroup(principal, #userId, #groupId) " +
-      "AND @securityService.userIsNotFounderOfGroup(#userId, #groupId)")
-  public Group removeUserFromGroup(@PathVariable Long groupId, @PathVariable Long userId) throws Exception {
-    return groupRepository.findById(groupId).map(group -> {
-      List<User> groupUsers = group.getUsers();
-      groupUsers.remove(userRepository.findById(userId).get());
-      group.setUsers(groupUsers);
-      return groupRepository.save(group);
-    }).orElseThrow(() -> new Exception("Cannot remove user with id " + userId + " from group with id " + groupId));
   }
 
   /**

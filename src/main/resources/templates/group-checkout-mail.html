@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        body {
+            font-size: 14px;
+            max-width: 600px;
+            margin: 0 auto;
+            font-family: sans-serif;
+        }
+        #header {
+            text-align: center; background-color: #4caf50; padding: 20px;
+        }
+        #content {
+            padding: 20px;
+        }
+        #footer {
+            text-align: center;
+            background-color: #4caf50;
+            padding: 5px;
+            color: white;
+            font-size: 12px;
+        }
+        #footer a {
+            color: white;
+            text-decoration: none;
+        }
+        #footer a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div id="header">
+    <img src="cid:logo.png" alt="Partido Logo" style="height: 35px;"/>
+</div>
+<div id="content">
+    <p>Hi <span th:text="${username}"></span>,</p>
+    <p>A checkout has been made in your group "<span th:text="${groupName}"></span>"</p>
+    <p>Here some compensation payment suggestions to start with balances of zero:</p>
+    <p>
+        <ul>
+            <li th:each="compensationPayment : ${report.compensationPayments}">
+                <span th:text="${compensationPayment.fromUser.username}"></span> has to pay
+                <span th:text="${#numbers.formatDecimal(compensationPayment.amount, 0, 2)}"></span><span th:text="${currency}"></span> to
+                <span th:text="${compensationPayment.toUser.username}"></span>
+            </li>
+        </ul>
+    </p>
+    <p>Thank you for using Partido and happy cost sharing!</p>
+    <p>Regards,</p>
+    <p><em>Jens Wagner @ Partido</em></p>
+</div>
+<div id="footer">
+    <a href="https://partido.rocks/">Homepage</a> |
+    <a href="https://partido.rocks/imprint/">Imprint</a> |
+    <a href="https://partido.rocks/privacy/">Privacy Policy</a> |
+    <a href="https://partido.rocks/contact/">Contact</a>
+</div>
+</body>
+</html>

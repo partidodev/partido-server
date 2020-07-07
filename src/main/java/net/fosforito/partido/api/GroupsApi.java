@@ -1,5 +1,6 @@
 package net.fosforito.partido.api;
 
+import net.fosforito.partido.mail.EmailService;
 import net.fosforito.partido.model.checkout.CheckoutReport;
 import net.fosforito.partido.model.group.*;
 import net.fosforito.partido.model.report.Report;
@@ -18,7 +19,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -31,18 +34,21 @@ public class GroupsApi {
   private final GroupService groupService;
   private final CurrentUserContext currentUserContext;
   private final HttpServletRequest request;
+  private final EmailService emailService;
 
   @Inject
   public GroupsApi(GroupRepository groupRepository,
                    UserRepository userRepository,
                    GroupService groupService,
                    CurrentUserContext currentUserContext,
-                   HttpServletRequest request) {
+                   HttpServletRequest request,
+                   EmailService emailService) {
     this.groupRepository = groupRepository;
     this.userRepository = userRepository;
     this.groupService = groupService;
     this.currentUserContext = currentUserContext;
     this.request = request;
+    this.emailService = emailService;
   }
 
   /**
@@ -196,7 +202,12 @@ public class GroupsApi {
   @PostMapping(value = "/groups/{groupId}/checkout")
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public CheckoutReport checkoutGroup(@PathVariable Long groupId) {
-    return groupService.checkoutGroup(groupId);
+    CheckoutReport checkoutReport = groupService.checkoutGroup(groupId);
+    Group group = groupRepository.findById(groupId).get();
+    Map<String, Object> templateModel = new HashMap<>();
+    templateModel.put("report", checkoutReport);
+    emailService.sendGroupCheckoutMail(group, templateModel);
+    return checkoutReport;
   }
 
   /**

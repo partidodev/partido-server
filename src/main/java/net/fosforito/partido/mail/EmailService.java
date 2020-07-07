@@ -1,5 +1,7 @@
 package net.fosforito.partido.mail;
 
+import net.fosforito.partido.model.group.Group;
+import net.fosforito.partido.model.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,6 +10,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -58,6 +61,7 @@ public class EmailService {
     }
   }
 
+  @Async
   public void sendEmailVerificationMail(String to, Map<String, Object> templateModel) {
     Context thymeleafContext = new Context();
     thymeleafContext.setVariables(templateModel);
@@ -65,11 +69,29 @@ public class EmailService {
     try {
       sendHtmlMessage(to, "Partido | Verify your email address", htmlBody);
     } catch (MessagingException e) {
-      LOGGER.error("Failed to send email verification mail to {}", to, e);
+      LOGGER.error("Failed to send email verification mail to user {}", to, e);
     }
   }
 
-  private void sendHtmlMessage(String to, String subject, String htmlBody) throws MessagingException {
+  @Async
+  public void sendGroupCheckoutMail(Group group, Map<String, Object> templateModel) {
+    Context thymeleafContext;
+    for (User user : group.getUsers()) {
+      thymeleafContext = new Context();
+      templateModel.put("username", user.getUsername());
+      templateModel.put("groupName", group.getName());
+      templateModel.put("currency", group.getCurrency());
+      thymeleafContext.setVariables(templateModel);
+      String htmlBody = thymeleafTemplateEngine.process("group-checkout-mail.html", thymeleafContext);
+      try {
+        sendHtmlMessage(user.getEmail(), "Partido | " + group.getName() + " | Checkout", htmlBody);
+      } catch (MessagingException e) {
+        LOGGER.error("Failed to send checkout mail for group '{}' to user {}", group.getId(), user.getEmail(), e);
+      }
+    }
+  }
+
+  public void sendHtmlMessage(String to, String subject, String htmlBody) throws MessagingException {
     MimeMessage message = emailSender.createMimeMessage();
     MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
     helper.setFrom(DEFAULT_SENDER_ADDRESS);

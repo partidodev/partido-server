@@ -74,7 +74,7 @@ public class GroupService {
    * @param groupId ID of the group to check out
    * @return Report with checkout and compensation payment information
    */
-  //TODO: close checked out bills and send an email to all group members
+  //TODO: close checked out bills
   public CheckoutReport checkoutGroup(Long groupId) {
     List<Balance> currentGroupBalances = createActualGroupReport(groupId).getBalances();
     List<Balance> positiveBalances = new LinkedList<>();

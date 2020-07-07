@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import net.fosforito.partido.model.user.User;
 
+import java.math.BigDecimal;
+
 public class CompensationPayment {
 
   @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
@@ -15,12 +17,12 @@ public class CompensationPayment {
   @JsonIdentityReference(alwaysAsId = true)
   private User toUser;
 
-  private double amount;
+  private BigDecimal amount;
 
   public CompensationPayment() {
   }
 
-  public CompensationPayment(User fromUser, User toUser, double amount) {
+  public CompensationPayment(User fromUser, User toUser, BigDecimal amount) {
     this.fromUser = fromUser;
     this.toUser = toUser;
     this.amount = amount;
@@ -42,11 +44,11 @@ public class CompensationPayment {
     this.toUser = toUser;
   }
 
-  public double getAmount() {
+  public BigDecimal getAmount() {
     return amount;
   }
 
-  public void setAmount(double amount) {
+  public void setAmount(BigDecimal amount) {
     this.amount = amount;
   }
 }

@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.LinkedList;
@@ -30,10 +31,10 @@ public class GroupServiceTest {
     User userD = new User("D", "d@test.de", "12345678", new Date(), true, "");
 
     List<Balance> currentGroupBalances = new LinkedList<>();
-    currentGroupBalances.add(new Balance(userA, 150));
-    currentGroupBalances.add(new Balance(userB, 50));
-    currentGroupBalances.add(new Balance(userC, -40));
-    currentGroupBalances.add(new Balance(userD, -160));
+    currentGroupBalances.add(new Balance(userA, BigDecimal.valueOf(150)));
+    currentGroupBalances.add(new Balance(userB, BigDecimal.valueOf(50)));
+    currentGroupBalances.add(new Balance(userC, BigDecimal.valueOf(-40)));
+    currentGroupBalances.add(new Balance(userD, BigDecimal.valueOf(-160)));
 
     Mockito.when(groupService.createActualGroupReport(1L))
         .thenReturn(new Report(LocalDateTime.now(), currentGroupBalances));
@@ -45,15 +46,15 @@ public class GroupServiceTest {
 
     Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
     Assert.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
-    Assert.assertEquals(150, checkoutReport.getCompensationPayments().get(0).getAmount(), 0.0);
+    Assert.assertEquals(BigDecimal.valueOf(150), checkoutReport.getCompensationPayments().get(0).getAmount());
 
     Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(1).getFromUser().getUsername());
     Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(1).getToUser().getUsername());
-    Assert.assertEquals(10, checkoutReport.getCompensationPayments().get(1).getAmount(), 0.0);
+    Assert.assertEquals(BigDecimal.valueOf(10), checkoutReport.getCompensationPayments().get(1).getAmount());
 
     Assert.assertEquals("C", checkoutReport.getCompensationPayments().get(2).getFromUser().getUsername());
     Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(2).getToUser().getUsername());
-    Assert.assertEquals(40, checkoutReport.getCompensationPayments().get(2).getAmount(), 0.0);
+    Assert.assertEquals(BigDecimal.valueOf(40), checkoutReport.getCompensationPayments().get(2).getAmount());
   }
 
   @Test
@@ -65,11 +66,11 @@ public class GroupServiceTest {
     User userE = new User("E", "e@test.de", "12345678", new Date(), true, "");
 
     List<Balance> currentGroupBalances = new LinkedList<>();
-    currentGroupBalances.add(new Balance(userA, 154.99));
-    currentGroupBalances.add(new Balance(userB, 38.53));
-    currentGroupBalances.add(new Balance(userC, 78.11));
-    currentGroupBalances.add(new Balance(userD, -270.63));
-    currentGroupBalances.add(new Balance(userE, -1));
+    currentGroupBalances.add(new Balance(userA, BigDecimal.valueOf(154.99)));
+    currentGroupBalances.add(new Balance(userB, BigDecimal.valueOf(38.53)));
+    currentGroupBalances.add(new Balance(userC, BigDecimal.valueOf(78.11)));
+    currentGroupBalances.add(new Balance(userD, BigDecimal.valueOf(-270.63)));
+    currentGroupBalances.add(new Balance(userE, BigDecimal.valueOf(-1)));
 
     Mockito.when(groupService.createActualGroupReport(1L))
         .thenReturn(new Report(LocalDateTime.now(), currentGroupBalances));
@@ -81,18 +82,18 @@ public class GroupServiceTest {
 
     Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
     Assert.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
-    Assert.assertEquals(154.99, checkoutReport.getCompensationPayments().get(0).getAmount(), 0.01);
+    Assert.assertEquals(BigDecimal.valueOf(154.99), checkoutReport.getCompensationPayments().get(0).getAmount());
 
     Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(1).getFromUser().getUsername());
     Assert.assertEquals("C", checkoutReport.getCompensationPayments().get(1).getToUser().getUsername());
-    Assert.assertEquals(78.11, checkoutReport.getCompensationPayments().get(1).getAmount(), 0.01);
+    Assert.assertEquals(BigDecimal.valueOf(78.11), checkoutReport.getCompensationPayments().get(1).getAmount());
 
     Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(2).getFromUser().getUsername());
     Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(2).getToUser().getUsername());
-    Assert.assertEquals(37.53, checkoutReport.getCompensationPayments().get(2).getAmount(), 0.01);
+    Assert.assertEquals(BigDecimal.valueOf(37.53), checkoutReport.getCompensationPayments().get(2).getAmount());
 
     Assert.assertEquals("E", checkoutReport.getCompensationPayments().get(3).getFromUser().getUsername());
     Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(3).getToUser().getUsername());
-    Assert.assertEquals(1, checkoutReport.getCompensationPayments().get(3).getAmount(), 0.01);
+    Assert.assertEquals(BigDecimal.ONE, checkoutReport.getCompensationPayments().get(3).getAmount());
   }
 }

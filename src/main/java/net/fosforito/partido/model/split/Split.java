@@ -7,6 +7,7 @@ import net.fosforito.partido.model.user.User;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 /**
  * A Split defines how much a debtor owes to a creditor. The Amount can be negative,
@@ -27,18 +28,16 @@ public class Split {
   @JsonIdentityReference(alwaysAsId = true)
   private User debtor;
 
-  @NotNull
-  private double paid;
+  private BigDecimal paid;
 
-  @NotNull
-  private double partsOfBill;
+  private BigDecimal partsOfBill;
 
   public Split() {
   }
 
   public Split(User debtor,
-               @NotNull double paid,
-               @NotNull double partsOfBill) {
+               BigDecimal paid,
+               BigDecimal partsOfBill) {
     this.debtor = debtor;
     this.paid = paid;
     this.partsOfBill = partsOfBill;
@@ -60,19 +59,19 @@ public class Split {
     this.debtor = debtor;
   }
 
-  public double getPaid() {
+  public BigDecimal getPaid() {
     return paid;
   }
 
-  public void setPaid(double paid) {
+  public void setPaid(BigDecimal paid) {
     this.paid = paid;
   }
 
-  public double getPartsOfBill() {
+  public BigDecimal getPartsOfBill() {
     return partsOfBill;
   }
 
-  public void setPartsOfBill(double partsOfBill) {
+  public void setPartsOfBill(BigDecimal partsOfBill) {
     this.partsOfBill = partsOfBill;
   }
 }

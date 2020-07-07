@@ -5,18 +5,20 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import net.fosforito.partido.model.user.User;
 
-public class Balance {
+import java.math.BigDecimal;
+
+public class Balance implements Comparable<Balance> {
 
   @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
   @JsonIdentityReference(alwaysAsId = true)
   private User user;
 
-  private double balance;
+  private BigDecimal balance;
 
   public Balance() {
   }
 
-  public Balance(User user, double balance) {
+  public Balance(User user, BigDecimal balance) {
     this.user = user;
     this.balance = balance;
   }
@@ -29,11 +31,16 @@ public class Balance {
     this.user = user;
   }
 
-  public double getBalance() {
+  public BigDecimal getBalance() {
     return balance;
   }
 
-  public void setBalance(double balance) {
+  public void setBalance(BigDecimal balance) {
     this.balance = balance;
+  }
+
+  @Override
+  public int compareTo(Balance o) {
+    return this.getBalance().compareTo(o.getBalance());
   }
 }

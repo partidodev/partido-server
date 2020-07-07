@@ -1,23 +1,21 @@
 package net.fosforito.partido.model.split;
 
-import javax.validation.constraints.NotNull;
+import java.math.BigDecimal;
 
 public class SplitDTO {
 
   private Long debtor;
 
-  @NotNull
-  private double paid;
+  private BigDecimal paid;
 
-  @NotNull
-  private double partsOfBill;
+  private BigDecimal partsOfBill;
 
   public SplitDTO() {
   }
 
   public SplitDTO(Long debtor,
-                  @NotNull double paid,
-                  @NotNull double partsOfBill) {
+                  BigDecimal paid,
+                  BigDecimal partsOfBill) {
     this.debtor = debtor;
     this.paid = paid;
     this.partsOfBill = partsOfBill;
@@ -31,19 +29,19 @@ public class SplitDTO {
     this.debtor = debtor;
   }
 
-  public double getPaid() {
+  public BigDecimal getPaid() {
     return paid;
   }
 
-  public void setPaid(double paid) {
+  public void setPaid(BigDecimal paid) {
     this.paid = paid;
   }
 
-  public double getPartsOfBill() {
+  public BigDecimal getPartsOfBill() {
     return partsOfBill;
   }
 
-  public void setPartsOfBill(double partsOfBill) {
+  public void setPartsOfBill(BigDecimal partsOfBill) {
     this.partsOfBill = partsOfBill;
   }
 }

@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,11 +44,15 @@ public class GroupService {
     List<Balance> balances = new ArrayList<>();
 
     for (User user : users) {
-      double balanceAmount = 0;
+      BigDecimal balanceAmount = BigDecimal.ZERO;
       for (Bill bill : bills) {
         for (Split split : bill.getSplits()) {
           if (split.getDebtor().equals(user)) {
-            balanceAmount += ( split.getPaid() - ( bill.getTotalAmount() / bill.getParts() * split.getPartsOfBill() ) );
+            balanceAmount = balanceAmount.add(
+                split.getPaid().subtract(
+                    bill.getTotalAmount().divide(bill.getParts()).multiply(split.getPartsOfBill())
+                )
+            );
           }
         }
       }
@@ -65,53 +70,53 @@ public class GroupService {
     List<CompensationPayment> compensationPayments = new LinkedList<>();
 
     currentGroupBalances.forEach(balance -> {
-      if (balance.getBalance() > 0) {
+      if (balance.getBalance().compareTo(BigDecimal.ZERO) > 0) {
         positiveBalances.add(balance);
-      } else if (balance.getBalance() < 0) {
+      } else if (balance.getBalance().compareTo(BigDecimal.ZERO) < 0) {
         negativeBalances.add(balance);
       }
       // else balance is 0 and ignored
     });
 
-    positiveBalances.sort(Comparator.comparingDouble(Balance::getBalance));
+    Collections.sort(positiveBalances);
     Collections.reverse(positiveBalances);
-    negativeBalances.sort(Comparator.comparingDouble(Balance::getBalance));
+    Collections.sort(negativeBalances);
 
     int positiveBalanceCounter = 0;
-    double positiveBalanceRest = positiveBalances.get(positiveBalanceCounter).getBalance();
-    double negativeBalanceRest;
+    BigDecimal positiveBalanceRest = positiveBalances.get(positiveBalanceCounter).getBalance();
+    BigDecimal negativeBalanceRest;
 
     for (Balance negativeBalance : negativeBalances) {
       negativeBalanceRest = negativeBalance.getBalance();
       do {
-        if (negativeBalanceRest * -1 > positiveBalanceRest) {
+        if (negativeBalanceRest.multiply(BigDecimal.valueOf(-1)).compareTo(positiveBalanceRest) > 0) {
           compensationPayments.add(new CompensationPayment(
               negativeBalance.getUser(),
               positiveBalances.get(positiveBalanceCounter).getUser(),
               positiveBalanceRest
           ));
-          negativeBalanceRest += positiveBalanceRest;
+          negativeBalanceRest = negativeBalanceRest.add(positiveBalanceRest);
           positiveBalanceCounter++;
           positiveBalanceRest = positiveBalances.get(positiveBalanceCounter).getBalance();
-        } else if (negativeBalanceRest * -1 < positiveBalanceRest) {
+        } else if (negativeBalanceRest.multiply(BigDecimal.valueOf(-1)).compareTo(positiveBalanceRest) < 0) {
           compensationPayments.add(new CompensationPayment(
               negativeBalance.getUser(),
               positiveBalances.get(positiveBalanceCounter).getUser(),
-              negativeBalanceRest * -1
+              negativeBalanceRest.multiply(BigDecimal.valueOf(-1))
           ));
-          negativeBalanceRest = 0;
-          positiveBalanceRest += negativeBalanceRest;
+          negativeBalanceRest = BigDecimal.ZERO;
+          positiveBalanceRest = positiveBalanceRest.add(negativeBalanceRest);
         } else { // negativeBalanceRest * -1 == positiveBalanceRest
           compensationPayments.add(new CompensationPayment(
               negativeBalance.getUser(),
               positiveBalances.get(positiveBalanceCounter).getUser(),
-             negativeBalanceRest * -1
+             negativeBalanceRest.multiply(BigDecimal.valueOf(-1))
           ));
-          negativeBalanceRest = 0;
+          negativeBalanceRest = BigDecimal.ZERO;
           positiveBalanceCounter++;
           positiveBalanceRest = positiveBalances.get(positiveBalanceCounter).getBalance();
         }
-      } while (negativeBalanceRest != 0);
+      } while (negativeBalanceRest.compareTo(BigDecimal.ZERO) != 0);
     }
 
     return new CheckoutReport(LocalDateTime.now(), compensationPayments);

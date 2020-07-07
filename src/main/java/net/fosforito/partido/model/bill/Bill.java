@@ -1,5 +1,6 @@
 package net.fosforito.partido.model.bill;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,8 +31,7 @@ public class Bill implements Comparable {
   @NotNull
   private String category;
 
-  @NotNull
-  private double totalAmount;
+  private BigDecimal totalAmount;
 
   @NotNull
   private Date billingDate;
@@ -40,7 +40,7 @@ public class Bill implements Comparable {
   private Date creationDate;
 
   @NotNull
-  private double parts;
+  private BigDecimal parts;
 
   @ManyToOne(fetch = FetchType.LAZY, optional = false)
   @JoinColumn(name = "group_id", nullable = false)
@@ -65,8 +65,8 @@ public class Bill implements Comparable {
 
   public Bill(@NotNull String description,
               @NotNull String category,
-              @NotNull double totalAmount,
-              @NotNull double parts,
+              BigDecimal totalAmount,
+              @NotNull BigDecimal parts,
               @NotNull Date billingDate,
               @NotNull Date creationDate,
               Group group,
@@ -108,19 +108,19 @@ public class Bill implements Comparable {
     this.category = category;
   }
 
-  public double getTotalAmount() {
+  public BigDecimal getTotalAmount() {
     return totalAmount;
   }
 
-  public void setTotalAmount(double totalAmount) {
+  public void setTotalAmount(BigDecimal totalAmount) {
     this.totalAmount = totalAmount;
   }
 
-  public double getParts() {
+  public BigDecimal getParts() {
     return parts;
   }
 
-  public void setParts(double parts) {
+  public void setParts(BigDecimal parts) {
     this.parts = parts;
   }
 

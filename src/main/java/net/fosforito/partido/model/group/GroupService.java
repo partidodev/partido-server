@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -55,7 +56,6 @@ public class GroupService {
     return new Report(LocalDateTime.now(), balances);
   }
 
-  //TODO: write a test for this thing!!!
   //TODO: close checked out bills and send an email to all group members
   public CheckoutReport checkoutGroup(Long groupId) {
     List<Balance> currentGroupBalances = createActualGroupReport(groupId).getBalances();
@@ -74,6 +74,7 @@ public class GroupService {
     });
 
     positiveBalances.sort(Comparator.comparingDouble(Balance::getBalance));
+    Collections.reverse(positiveBalances);
     negativeBalances.sort(Comparator.comparingDouble(Balance::getBalance));
 
     int positiveBalanceCounter = 0;
@@ -96,7 +97,7 @@ public class GroupService {
           compensationPayments.add(new CompensationPayment(
               negativeBalance.getUser(),
               positiveBalances.get(positiveBalanceCounter).getUser(),
-              negativeBalanceRest
+              negativeBalanceRest * -1
           ));
           negativeBalanceRest = 0;
           positiveBalanceRest += negativeBalanceRest;
@@ -104,7 +105,7 @@ public class GroupService {
           compensationPayments.add(new CompensationPayment(
               negativeBalance.getUser(),
               positiveBalances.get(positiveBalanceCounter).getUser(),
-              negativeBalanceRest
+             negativeBalanceRest * -1
           ));
           negativeBalanceRest = 0;
           positiveBalanceCounter++;

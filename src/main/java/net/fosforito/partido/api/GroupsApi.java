@@ -196,18 +196,22 @@ public class GroupsApi {
   @GetMapping(value = "/groups/{groupId}/report")
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public Report getGroupReport(@PathVariable Long groupId) {
-    return groupService.createActualGroupReport(groupId);
+    return groupService.createActualGroupReport(groupId, false);
   }
 
   @PostMapping(value = "/groups/{groupId}/checkout")
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
-  public CheckoutReport checkoutGroup(@PathVariable Long groupId) {
+  public ResponseEntity<CheckoutReport> checkoutGroup(@PathVariable Long groupId) {
     CheckoutReport checkoutReport = groupService.checkoutGroup(groupId);
+    if (checkoutReport == null) {
+      // If checkout report is null, checkout report cannot be made due to zero balances
+      return new ResponseEntity<>(null, HttpStatus.PRECONDITION_FAILED);
+    }
     Group group = groupRepository.findById(groupId).get();
     Map<String, Object> templateModel = new HashMap<>();
     templateModel.put("report", checkoutReport);
     emailService.sendGroupCheckoutMail(group, templateModel);
-    return checkoutReport;
+    return new ResponseEntity<>(checkoutReport, HttpStatus.OK);
   }
 
   /**

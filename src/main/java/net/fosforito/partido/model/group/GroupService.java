@@ -37,14 +37,23 @@ public class GroupService {
   }
 
   /**
-   * Creates an overview list with current balances
-   * of all members in a specific group.
+   * Creates an overview list with current balances of all members in a specific group.
+   * Open bills can be closed if the corresponding parameter is set to true. This is needed
+   * for group checkout processes.
    * @param groupId ID of the group to get balances for
+   * @param closeOpenBills close currently open bills or not
    * @return Report with balances
    */
-  public Report createActualGroupReport(Long groupId) {
+  public Report createActualGroupReport(Long groupId, boolean closeOpenBills) {
     List<Bill> bills = billRepository.findAllByGroupIdAndClosed(groupId, false);
     List<User> users = groupRepository.findById(groupId).get().getUsers();
+
+    if (closeOpenBills) {
+      for (Bill bill : bills) {
+        bill.setClosed(true);
+        billRepository.save(bill);
+      }
+    }
 
     List<Balance> balances = new ArrayList<>();
 
@@ -76,7 +85,7 @@ public class GroupService {
    */
   //TODO: close checked out bills
   public CheckoutReport checkoutGroup(Long groupId) {
-    List<Balance> currentGroupBalances = createActualGroupReport(groupId).getBalances();
+    List<Balance> currentGroupBalances = createActualGroupReport(groupId, true).getBalances();
     List<Balance> positiveBalances = new LinkedList<>();
     List<Balance> negativeBalances = new LinkedList<>();
     List<CompensationPayment> compensationPayments = new LinkedList<>();
@@ -89,6 +98,13 @@ public class GroupService {
       }
       // else balance is 0 and ignored
     });
+
+    // Checkout group only if balances are not all zero.
+    // If there is at least 1 positive balance, there MUST be at
+    // least 1 negative balance and vice versa.
+    if (positiveBalances.size() == 0 || negativeBalances.size() == 0) {
+      return null;
+    }
 
     Collections.sort(positiveBalances);
     Collections.reverse(positiveBalances); //descending (highest amounts first)

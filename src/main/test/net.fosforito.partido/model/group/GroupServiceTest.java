@@ -36,7 +36,7 @@ public class GroupServiceTest {
     currentGroupBalances.add(new Balance(userC, BigDecimal.valueOf(-40)));
     currentGroupBalances.add(new Balance(userD, BigDecimal.valueOf(-160)));
 
-    Mockito.when(groupService.createActualGroupReport(1L))
+    Mockito.when(groupService.createActualGroupReport(1L, true))
         .thenReturn(new Report(LocalDateTime.now(), currentGroupBalances));
     Mockito.when(groupService.checkoutGroup(1L)).thenCallRealMethod();
 
@@ -72,7 +72,7 @@ public class GroupServiceTest {
     currentGroupBalances.add(new Balance(userD, BigDecimal.valueOf(-270.63)));
     currentGroupBalances.add(new Balance(userE, BigDecimal.valueOf(-1)));
 
-    Mockito.when(groupService.createActualGroupReport(1L))
+    Mockito.when(groupService.createActualGroupReport(1L, true))
         .thenReturn(new Report(LocalDateTime.now(), currentGroupBalances));
     Mockito.when(groupService.checkoutGroup(1L)).thenCallRealMethod();
 

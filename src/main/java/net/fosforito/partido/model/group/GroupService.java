@@ -83,7 +83,6 @@ public class GroupService {
    * @param groupId ID of the group to check out
    * @return Report with checkout and compensation payment information
    */
-  //TODO: close checked out bills
   public CheckoutReport checkoutGroup(Long groupId) {
     List<Balance> currentGroupBalances = createActualGroupReport(groupId, true).getBalances();
     List<Balance> positiveBalances = new LinkedList<>();
@@ -141,8 +140,6 @@ public class GroupService {
              negativeBalanceRest.multiply(BigDecimal.valueOf(-1))
           ));
           negativeBalanceRest = BigDecimal.ZERO;
-          positiveBalanceCounter++;
-          positiveBalanceRest = positiveBalances.get(positiveBalanceCounter).getBalance();
         }
       } while (negativeBalanceRest.compareTo(BigDecimal.ZERO) != 0);
     }

@@ -1,5 +1,5 @@
 # Partido Server
-[![Build Status](https://ci.fosforito.net/api/badges/Fosforito/partido-server/status.svg)](https://ci.fosforito.net/Fosforito/partido-server)
+![CI](https://github.com/jens-wagner/partido-server/workflows/CI/badge.svg)
 
 ## Enabling SSL
 

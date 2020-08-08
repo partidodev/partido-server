@@ -96,4 +96,26 @@ public class GroupServiceTest {
     Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(3).getToUser().getUsername());
     Assert.assertEquals(BigDecimal.ONE, checkoutReport.getCompensationPayments().get(3).getAmount());
   }
+
+  @Test
+  public void checkoutGroupCaseThree() {
+    User userA = new User("A", "a@test.de", "12345678", new Date(), true, "");
+    User userB = new User("B", "b@test.de", "12345678", new Date(), true, "");
+
+    List<Balance> currentGroupBalances = new LinkedList<>();
+    currentGroupBalances.add(new Balance(userA, BigDecimal.valueOf(150)));
+    currentGroupBalances.add(new Balance(userB, BigDecimal.valueOf(-150)));
+
+    Mockito.when(groupService.createActualGroupReport(1L, true))
+        .thenReturn(new Report(LocalDateTime.now(), currentGroupBalances));
+    Mockito.when(groupService.checkoutGroup(1L)).thenCallRealMethod();
+
+    CheckoutReport checkoutReport = groupService.checkoutGroup(1L);
+
+    Assert.assertEquals(1, checkoutReport.getCompensationPayments().size());
+
+    Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
+    Assert.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
+    Assert.assertEquals(BigDecimal.valueOf(150), checkoutReport.getCompensationPayments().get(0).getAmount());
+  }
 }

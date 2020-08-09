@@ -1,6 +1,9 @@
 package net.fosforito.partido.api;
 
 import net.fosforito.partido.mail.EmailService;
+import net.fosforito.partido.model.group.Group;
+import net.fosforito.partido.model.report.Balance;
+import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserDTO;
@@ -13,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Optional;
@@ -30,16 +35,19 @@ public class UsersApi {
   private final PasswordEncoder passwordEncoder;
   private final CurrentUserContext currentUserContext;
   private final EmailService emailService;
+  private final GroupsApi groupsApi;
 
   @Inject
   public UsersApi(UserRepository userRepository,
                   PasswordEncoder passwordEncoder,
                   CurrentUserContext currentUserContext,
-                  EmailService emailService) {
+                  EmailService emailService,
+                  GroupsApi groupsApi) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.currentUserContext = currentUserContext;
     this.emailService = emailService;
+    this.groupsApi = groupsApi;
   }
 
   /**
@@ -81,18 +89,38 @@ public class UsersApi {
     return new ResponseEntity<>(savedUser, HttpStatus.OK);
   }
 
+  /**
+   * Delete user if there are no groups with non
+   * zero balances that must be settled up before.
+   *
+   * @param userId ID of user to delete
+   * @return ResponseEntity with status code:
+   *         - 200 if user was deleted
+   *         - 404 if user was not found
+   *         - 412 if there are groups with open balances
+   */
   @DeleteMapping(value = "/users/{userId}")
-  @PreAuthorize("@securityService.userIsSameUser(principal, #userId) OR hasRole('ADMIN')")
+  @PreAuthorize("@securityService.userIsSameUser(principal, #userId)")
   public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-    //TODO: what will be deleted? Or just anonymize data?
-    Optional<User> userOptional = userRepository.findById(userId);
-    if (userOptional.isPresent()) {
-      userOptional.map(user -> {
-        userRepository.delete(user);
-        return ResponseEntity.ok().build();
-      });
+
+    List<Group> groups = groupsApi.getCurrentUsersGroups();
+
+    for (Group group : groups) {
+      Report report = groupsApi.getGroupReport(group.getId());
+      for (Balance balance : report.getBalances()) {
+        if (!(balance.getBalance().compareTo(BigDecimal.ZERO) == 0)) {
+          return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
+        }
+      }
     }
-    return ResponseEntity.notFound().build();
+
+    return userRepository.findById(userId)
+        .map(user -> {
+          userRepository.delete(user);
+          return ResponseEntity.ok().build();
+        }).orElse(
+            ResponseEntity.notFound().build()
+        );
   }
 
   /**

@@ -49,7 +49,10 @@ public class Bill implements Comparable {
   private Group group;
 
   @OneToOne
-  @JoinColumn(name = "creator_user_id")
+  @JoinColumn(
+      name = "creator_user_id",
+      foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT)
+  )
   @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
   @JsonIdentityReference(alwaysAsId=true)
   private User creator;

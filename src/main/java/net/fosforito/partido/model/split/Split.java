@@ -13,7 +13,7 @@ import java.math.BigDecimal;
  * A Split defines how much a debtor owes to a creditor. The Amount can be negative,
  * in this case the debtor is not really a \&quot;debtor\&quot; because he will recieve money.
  * But for naming conventions the creditor is always the \&quot;base\&quot; of a bill and the
- * debtors give or recieve money from or to this owner.
+ * debtors give or receive money from or to this owner.
  **/
 @Entity
 public class Split {
@@ -22,14 +22,20 @@ public class Split {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @NotNull
   @OneToOne
-  @JoinColumn(name = "debtor_user_id")
+  @JoinColumn(
+      name = "debtor_user_id",
+      foreignKey = @ForeignKey(name = "none", value = ConstraintMode.NO_CONSTRAINT)
+  )
   @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
   @JsonIdentityReference(alwaysAsId = true)
   private User debtor;
 
+  @NotNull
   private BigDecimal paid;
 
+  @NotNull
   private BigDecimal partsOfBill;
 
   public Split() {

@@ -1,7 +1,9 @@
 package net.fosforito.partido.api;
 
 import net.fosforito.partido.mail.EmailService;
+import net.fosforito.partido.model.bill.BillRepository;
 import net.fosforito.partido.model.group.Group;
+import net.fosforito.partido.model.group.GroupRepository;
 import net.fosforito.partido.model.report.Balance;
 import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.user.CurrentUserContext;
@@ -17,12 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class UsersApi {
@@ -36,18 +33,24 @@ public class UsersApi {
   private final CurrentUserContext currentUserContext;
   private final EmailService emailService;
   private final GroupsApi groupsApi;
+  private final GroupRepository groupRepository;
+  private final BillRepository billRepository;
 
   @Inject
   public UsersApi(UserRepository userRepository,
                   PasswordEncoder passwordEncoder,
                   CurrentUserContext currentUserContext,
                   EmailService emailService,
-                  GroupsApi groupsApi) {
+                  GroupsApi groupsApi,
+                  GroupRepository groupRepository,
+                  BillRepository billRepository) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.currentUserContext = currentUserContext;
     this.emailService = emailService;
     this.groupsApi = groupsApi;
+    this.groupRepository = groupRepository;
+    this.billRepository = billRepository;
   }
 
   /**
@@ -105,6 +108,8 @@ public class UsersApi {
 
     List<Group> groups = groupsApi.getCurrentUsersGroups();
 
+    // Make sure that all groups where user is member
+    // of have been settled up before deleting user
     for (Group group : groups) {
       Report report = groupsApi.getGroupReport(group.getId());
       for (Balance balance : report.getBalances()) {
@@ -114,6 +119,20 @@ public class UsersApi {
       }
     }
 
+    // Remove user from all groups
+    for (Group group : groups) {
+      List<User> users = group.getUsers();
+      List<User> updatedUsers = new ArrayList<>();
+      for (User user: users) {
+        if (!user.getId().equals(userId)) {
+          updatedUsers.add(user);
+        }
+      }
+      group.setUsers(updatedUsers);
+      groupRepository.save(group);
+    }
+
+    // Delete user entity
     return userRepository.findById(userId)
         .map(user -> {
           userRepository.delete(user);

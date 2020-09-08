@@ -43,8 +43,8 @@ public class SecurityService {
     User user = userRepository.findByEmail(userDetails.getUsername());
     Optional<Group> groupOptional = groupRepository.findById(groupId);
     return groupOptional
-            .filter(group -> userIsFounderOfGroup(user, group) || userListContainsUser(group.getUsers(), user))
-            .isPresent();
+        .filter(group -> userListContainsUser(group.getUsers(), user))
+        .isPresent();
   }
 
   /**
@@ -55,45 +55,6 @@ public class SecurityService {
    */
   public boolean userCanReadGroup(UserDetails userDetails, Long groupId) {
     return userCanUpdateGroup(userDetails, groupId);
-  }
-
-  /**
-   * Determine if a given user is the founder of a given group
-   * @param userDetails of the user
-   * @param groupId of the group
-   * @return true if user is the founder of the group
-   */
-  public boolean userIsFounderOfGroup(UserDetails userDetails, Long groupId) {
-    Optional<Group> groupOptional = groupRepository.findById(groupId);
-    User user = userRepository.findByEmail(userDetails.getUsername());
-    return groupOptional
-            .filter(group -> userIsFounderOfGroup(user, group))
-            .isPresent();
-  }
-
-  /**
-   * Determine if a given user is the founder of a given group
-   * @param user user object
-   * @param group group object
-   * @return true if user is the founder of the group
-   */
-  public boolean userIsFounderOfGroup(User user, Group group) {
-    return group.getFounder().getId().equals(user.getId());
-  }
-
-  /**
-   * Determine if a given user is the founder of a given group
-   * @param userId user id
-   * @param groupId group id
-   * @return true if user is NOT the founder of the group
-   */
-  public boolean userIsNotFounderOfGroup(Long userId, Long groupId) {
-    Optional<User> userOptional = userRepository.findById(userId);
-    Optional<Group> groupOptional = groupRepository.findById(groupId);
-    if (userOptional.isPresent() && groupOptional.isPresent()) {
-      return !userIsFounderOfGroup(userOptional.get(), groupOptional.get());
-    }
-    return false;
   }
 
   /**
@@ -108,10 +69,8 @@ public class SecurityService {
     User user = userRepository.findByEmail(userDetails.getUsername());
     Optional<Group> groupOptional = groupRepository.findById(groupId);
     return groupOptional
-            .filter(group -> (
-                    userListContainsUser(group.getUsers(), user) || userIsFounderOfGroup(user, group)
-            ) && user.getId().equals(userId))
-            .isPresent();
+        .filter(group -> userListContainsUser(group.getUsers(), user) && user.getId().equals(userId))
+        .isPresent();
   }
 
   /**
@@ -135,9 +94,8 @@ public class SecurityService {
     User user = userRepository.findByEmail(userDetails.getUsername());
     Optional<Bill> billOptional = billRepository.findById(billId);
     return billOptional
-            .filter(bill -> userIsFounderOfGroup(user, bill.getGroup())
-                    || bill.getCreator().getId().equals(user.getId()))
-            .isPresent();
+        .filter(bill -> bill.getCreator().getId().equals(user.getId()))
+        .isPresent();
   }
 
   /**

@@ -74,9 +74,9 @@ public class GroupsApi {
       consumes = MediaType.APPLICATION_JSON
   )
   public Group createGroup(@RequestBody GroupDTO groupDTO) {
-    User founder = currentUserContext.getCurrentUser();
+    User currentUser = currentUserContext.getCurrentUser();
     List<User> userList = new ArrayList<>();
-    userList.add(founder);
+    userList.add(currentUser);
     Group group = new Group();
     group.setName(groupDTO.getName());
     group.setStatus(groupDTO.getStatus());
@@ -84,7 +84,6 @@ public class GroupsApi {
     group.setJoinModeActive(groupDTO.isJoinModeActive());
     group.setJoinKey(groupDTO.getJoinKey());
     group.setCreationDate(new Date());
-    group.setFounder(founder);
     group.setUsers(userList);
     return groupRepository.save(group);
   }

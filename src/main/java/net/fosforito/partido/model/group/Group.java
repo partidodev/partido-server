@@ -37,12 +37,6 @@ public class Group {
   @JsonIgnore
   private Date creationDate;
 
-  @ManyToOne
-  @NotNull
-  @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
-  @JsonIdentityReference(alwaysAsId=true)
-  private User founder;
-
   @ManyToMany(fetch = FetchType.LAZY,
       cascade = {
           CascadeType.PERSIST,
@@ -64,7 +58,7 @@ public class Group {
           @NotNull boolean joinModeActive,
           String joinKey,
           @NotNull Date creationDate,
-          @NotNull User founder, List<User> users
+          List<User> users
   ) {
     this.name = name;
     this.status = status;
@@ -72,7 +66,6 @@ public class Group {
     this.joinModeActive = joinModeActive;
     this.joinKey = joinKey;
     this.creationDate = creationDate;
-    this.founder = founder;
     this.users = users;
   }
 
@@ -130,14 +123,6 @@ public class Group {
 
   public void setCreationDate(Date creationDate) {
     this.creationDate = creationDate;
-  }
-
-  public User getFounder() {
-    return founder;
-  }
-
-  public void setFounder(User founder) {
-    this.founder = founder;
   }
 
   public List<User> getUsers() {

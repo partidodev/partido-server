@@ -3,6 +3,7 @@ package net.fosforito.partido.api;
 import net.fosforito.partido.mail.EmailService;
 import net.fosforito.partido.model.checkout.CheckoutReport;
 import net.fosforito.partido.model.group.*;
+import net.fosforito.partido.model.report.Balance;
 import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -132,18 +135,6 @@ public class GroupsApi {
             .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
-  @DeleteMapping(value = "/groups/{groupId}")
-  @PreAuthorize("@securityService.userIsFounderOfGroup(principal, #groupId)")
-  public ResponseEntity<?> deleteGroup(@PathVariable Long groupId) throws Exception {
-    //TODO: make sure to delete all bills with splits and user-group relations but no user accounts
-    //TODO: but first make sure balances are zero
-    return groupRepository.findById(groupId)
-        .map(group -> {
-          groupRepository.delete(group);
-          return ResponseEntity.ok().build();
-        }).orElseThrow(() -> new Exception("Group not found with id " + groupId));
-  }
-
   /**
    * Try to join a group.
    * - Returns status code 404 (not found) if group or user does not exist.
@@ -185,6 +176,49 @@ public class GroupsApi {
       LOGGER.warn("Join group attempt for ip {} failed", getClientIP());
       return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
+  }
+
+  /**
+   * Allow users of a group to leave the group if group balances are all zero.
+   * @param groupId Id of the group to leave
+   * @param principal Contains current user's data
+   * @return ResponseEntity with status code:
+   *         - 200 if user was removed from the group
+   *         - 404 if group was not found
+   *         - 412 if the group has open (non zero) balances
+   */
+  @PostMapping(value = "/groups/{groupId}/leave", produces = MediaType.APPLICATION_JSON)
+  @PreAuthorize("@securityService.userCanUpdateGroup(principal, #groupId)")
+  public ResponseEntity<Group> leaveGroup(@PathVariable Long groupId, Principal principal) {
+
+    User userToRemoveFromGroup = userRepository.findByEmail(principal.getName());
+    Optional<Group> optionalGroup = groupRepository.findById(groupId);
+    Group group;
+
+    if (optionalGroup.isPresent()) {
+      group = optionalGroup.get();
+    } else {
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    Report report = getGroupReport(group.getId());
+    for (Balance balance : report.getBalances()) {
+      if (!(balance.getBalance().compareTo(BigDecimal.ZERO) == 0)) {
+        return new ResponseEntity<>(HttpStatus.PRECONDITION_FAILED);
+      }
+    }
+
+    List<User> users = group.getUsers();
+    List<User> updatedUsers = new ArrayList<>();
+    for (User user: users) {
+      if (!user.getId().equals(userToRemoveFromGroup.getId())) {
+        updatedUsers.add(user);
+      }
+    }
+    group.setUsers(updatedUsers);
+    groupRepository.save(group);
+
+    return new ResponseEntity<>(group, HttpStatus.OK);
   }
 
   /**

@@ -4,6 +4,42 @@
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 ![CI](https://github.com/jens-wagner/partido-server/workflows/CI/badge.svg)
 
+This is the backend server application of the Partido platform written in Java with the Spring Framework.
+
+Partido itself is a platform independent App for sharing group expenses.
+
+## How to run the server
+
+In the project root folder, run:
+
+```
+mvn spring-boot:run
+```
+
+or just press the IDE's run button.
+
+The server will listen on Port 8080 per default (defined in `./src/main/resources/application.properties`).
+
+## Database
+
+The server needs an already existing PostgreSQL database.
+
+The defaults defined in `./src/main/resources/application.properties` are:
+
+```
+## Spring DATASOURCE (DataSourceAutoConfiguration & DataSourceProperties)
+spring.datasource.url=jdbc:postgresql://localhost:5432/partido-server
+spring.datasource.username=postgres
+spring.datasource.password=postgres
+```
+
+You can override these properties with custom start parameters.
+
+## Mail sending on local machine
+
+Per default, the server tries to send emails to localhost on Port 25 without any credentials.
+If you don't have a (fake) Mailserver installed, the console will output some specific errors, you can ignore. If you want to get those emails, you can use a tool like FakeSMTP: http://nilhcem.com/FakeSMTP/
+
 ## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):

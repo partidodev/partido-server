@@ -1,6 +1,6 @@
 # Partido Server
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/partidodev/partido-server/CI) ![Github All Contributors](https://img.shields.io/github/all-contributors/partidodev/partido-server/main)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/partidodev/partido-server/CI?style=flat-square) ![Github All Contributors](https://img.shields.io/github/all-contributors/partidodev/partido-server/main?style=flat-square)
 
 This is the backend server application of the Partido platform written in Java with the Spring Framework.
 

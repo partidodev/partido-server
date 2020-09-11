@@ -1,6 +1,7 @@
 # Partido Server
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/partidodev/partido-server/CI?style=flat-square) ![Github All Contributors](https://img.shields.io/github/all-contributors/partidodev/partido-server/main?style=flat-square)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/partidodev/partido-server/CI?style=flat-square)
+![Github All Contributors](https://img.shields.io/github/all-contributors/partidodev/partido-server/main?style=flat-square)
 
 This is the backend server application of the Partido platform written in Java with the Spring Framework.
 
@@ -17,6 +18,12 @@ mvn spring-boot:run
 or just press the IDE's run button.
 
 The server will listen on Port 8080 per default (defined in `./src/main/resources/application.properties`).
+
+## API
+
+The server does not allow normal access via web browser, except for verifying new user accounts. All operations must be done with a REST client. Normally this would be the [Partido Client App](https://github.com/partidodev/partido-client) but for testing you can use any REST tool like [Insomnia](https://github.com/Kong/insomnia), Postman, etc.
+
+_OpenAPI Spec of the server is on the To Do List..._
 
 ## Database
 
@@ -36,7 +43,7 @@ You can override these properties with custom start parameters.
 ## Mail sending on local machine
 
 Per default, the server tries to send emails to localhost on Port 25 without any credentials.
-If you don't have a (fake) Mailserver installed, the console will output some specific errors, you can ignore. If you want to get those emails, you can use a tool like FakeSMTP: http://nilhcem.com/FakeSMTP/
+If you don't have a (fake) Mailserver installed, the console will output some specific errors, you can ignore. If you want to get those emails, you can use a tool like [FakeSMTP](http://nilhcem.com/FakeSMTP/).
 
 ## Contributors ✨
 

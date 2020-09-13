@@ -1,5 +1,6 @@
 package net.fosforito.partido.api;
 
+import net.fosforito.partido.database.UTCDateService;
 import net.fosforito.partido.mail.EmailService;
 import net.fosforito.partido.model.checkout.CheckoutReport;
 import net.fosforito.partido.model.group.*;
@@ -20,12 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 import java.security.Principal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 public class GroupsApi {
@@ -38,6 +34,7 @@ public class GroupsApi {
   private final CurrentUserContext currentUserContext;
   private final HttpServletRequest request;
   private final EmailService emailService;
+  private final UTCDateService dateService;
 
   @Inject
   public GroupsApi(GroupRepository groupRepository,
@@ -45,13 +42,14 @@ public class GroupsApi {
                    GroupService groupService,
                    CurrentUserContext currentUserContext,
                    HttpServletRequest request,
-                   EmailService emailService) {
+                   EmailService emailService, UTCDateService dateService) {
     this.groupRepository = groupRepository;
     this.userRepository = userRepository;
     this.groupService = groupService;
     this.currentUserContext = currentUserContext;
     this.request = request;
     this.emailService = emailService;
+    this.dateService = dateService;
   }
 
   /**
@@ -59,8 +57,8 @@ public class GroupsApi {
    * @return List with group objects
    */
   @GetMapping(
-      value = "/currentusergroups",
-      produces = MediaType.APPLICATION_JSON
+          value = "/currentusergroups",
+          produces = MediaType.APPLICATION_JSON
   )
   public List<Group> getCurrentUsersGroups() {
     return groupRepository.findAllByUsersIsContaining(currentUserContext.getCurrentUser());
@@ -72,9 +70,9 @@ public class GroupsApi {
    * @return newly created group object as confirmation
    */
   @PostMapping(
-      value = "/groups",
-      produces = MediaType.APPLICATION_JSON,
-      consumes = MediaType.APPLICATION_JSON
+          value = "/groups",
+          produces = MediaType.APPLICATION_JSON,
+          consumes = MediaType.APPLICATION_JSON
   )
   public Group createGroup(@RequestBody GroupDTO groupDTO) {
     User currentUser = currentUserContext.getCurrentUser();
@@ -86,7 +84,7 @@ public class GroupsApi {
     group.setCurrency(groupDTO.getCurrency());
     group.setJoinModeActive(groupDTO.isJoinModeActive());
     group.setJoinKey(groupDTO.getJoinKey());
-    group.setCreationDate(new Date());
+    group.setCreationDate(dateService.getConvertedUTCDate());
     group.setUsers(userList);
     return groupRepository.save(group);
   }
@@ -98,9 +96,9 @@ public class GroupsApi {
    * @return updated group object if succeeded
    */
   @PutMapping(
-      value = "/groups/{groupId}",
-      produces = MediaType.APPLICATION_JSON,
-      consumes = MediaType.APPLICATION_JSON
+          value = "/groups/{groupId}",
+          produces = MediaType.APPLICATION_JSON,
+          consumes = MediaType.APPLICATION_JSON
   )
   @PreAuthorize("@securityService.userCanUpdateGroup(principal, #groupId)")
   public ResponseEntity<Group> updateGroup(@PathVariable Long groupId, @RequestBody GroupDTO groupDTO) {
@@ -125,8 +123,8 @@ public class GroupsApi {
    * @return group object with users list and other information
    */
   @GetMapping(
-      value = "/groups/{groupId}",
-      produces = MediaType.APPLICATION_JSON
+          value = "/groups/{groupId}",
+          produces = MediaType.APPLICATION_JSON
   )
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public ResponseEntity<Group> getGroup(@PathVariable Long groupId) {

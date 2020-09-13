@@ -1,5 +1,6 @@
 package net.fosforito.partido.api;
 
+import net.fosforito.partido.database.UTCDateService;
 import net.fosforito.partido.model.bill.Bill;
 import net.fosforito.partido.model.bill.BillDTO;
 import net.fosforito.partido.model.bill.BillRepository;
@@ -20,7 +21,6 @@ import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,16 +31,19 @@ public class BillsApi {
   private final BillRepository billRepository;
   private final UserRepository userRepository;
   private final CurrentUserContext currentUserContext;
+  private final UTCDateService dateService;
 
   @Inject
   public BillsApi(GroupRepository groupRepository,
                   BillRepository billRepository,
                   UserRepository userRepository,
-                  CurrentUserContext currentUserContext) {
+                  CurrentUserContext currentUserContext,
+                  UTCDateService dateService) {
     this.groupRepository = groupRepository;
     this.billRepository = billRepository;
     this.userRepository = userRepository;
     this.currentUserContext = currentUserContext;
+    this.dateService = dateService;
   }
 
   /**
@@ -74,7 +77,7 @@ public class BillsApi {
               billDTO.getTotalAmount(),
               billDTO.getParts(),
               billDTO.getBillingDate(),
-              new Date(),
+              dateService.getConvertedUTCDate(),
               groupOptional.get(),
               currentUserContext.getCurrentUser(),
               convertToSplits(billDTO.getSplits())

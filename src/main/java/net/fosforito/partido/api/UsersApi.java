@@ -2,14 +2,9 @@ package net.fosforito.partido.api;
 
 import net.fosforito.partido.mail.EmailService;
 import net.fosforito.partido.model.bill.BillRepository;
-import net.fosforito.partido.model.group.Group;
 import net.fosforito.partido.model.group.GroupRepository;
-import net.fosforito.partido.model.report.Balance;
-import net.fosforito.partido.model.report.Report;
-import net.fosforito.partido.model.user.CurrentUserContext;
-import net.fosforito.partido.model.user.User;
-import net.fosforito.partido.model.user.UserDTO;
-import net.fosforito.partido.model.user.UserRepository;
+import net.fosforito.partido.model.user.*;
+import net.fosforito.partido.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
-import java.math.BigDecimal;
-import java.util.*;
 
 @RestController
 public class UsersApi {
@@ -28,6 +21,7 @@ public class UsersApi {
   public static final String USERS_API_PATH = "users/";
   public static final String VERIFY_PATH = "/verify/";
 
+  private final UserService userService;
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
   private final CurrentUserContext currentUserContext;
@@ -37,13 +31,15 @@ public class UsersApi {
   private final BillRepository billRepository;
 
   @Inject
-  public UsersApi(UserRepository userRepository,
+  public UsersApi(UserService userService,
+                  UserRepository userRepository,
                   PasswordEncoder passwordEncoder,
                   CurrentUserContext currentUserContext,
                   EmailService emailService,
                   GroupsApi groupsApi,
                   GroupRepository groupRepository,
                   BillRepository billRepository) {
+    this.userService = userService;
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.currentUserContext = currentUserContext;
@@ -70,26 +66,12 @@ public class UsersApi {
    */
   @PostMapping(value = {"/users"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   public ResponseEntity<User> createUser(@RequestBody UserDTO userDTO) {
-    User user = new User();
-    if (userRepository.findByEmail(userDTO.getEmail()) != null) {
-      // Email already registered! Return error status
-      // with empty user object because client handling is problematic else
-      return new ResponseEntity<>(user, HttpStatus.PRECONDITION_FAILED);
+    Pair<String, User> validationOfCreatedUser = userService.createUser(userDTO);
+    if (validationOfCreatedUser.getFirst() == null) {
+      return new ResponseEntity<>(validationOfCreatedUser.getSecond(), HttpStatus.OK);
+    } else {
+      return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
-    String emailVerificationCode = UUID.randomUUID().toString();
-    user.setUsername(userDTO.getUsername());
-    user.setEmail(userDTO.getEmail());
-    user.setPassword(passwordEncoder.encode(userDTO.getPassword()));
-    user.setRegistrationDate(new Date());
-    user.setEmailVerified(false); //verify Email to activate account
-    user.setEmailVerificationCode(emailVerificationCode);
-    User savedUser = userRepository.save(user);
-    Map<String, Object> templateModel = new HashMap<>();
-    templateModel.put("username", userDTO.getUsername());
-    templateModel.put("verificationLink",
-        PARTIDO_API_BASE + USERS_API_PATH + savedUser.getId() + VERIFY_PATH + emailVerificationCode);
-    emailService.sendEmailVerificationMail(userDTO.getEmail(), templateModel);
-    return new ResponseEntity<>(savedUser, HttpStatus.OK);
   }
 
   /**
@@ -105,41 +87,17 @@ public class UsersApi {
   @DeleteMapping(value = "/users/{userId}")
   @PreAuthorize("@securityService.userIsSameUser(principal, #userId)")
   public ResponseEntity<?> deleteUser(@PathVariable Long userId) {
-
-    List<Group> groups = groupsApi.getCurrentUsersGroups();
-
-    // Make sure that all groups where user is member
-    // of have been settled up before deleting user
-    for (Group group : groups) {
-      Report report = groupsApi.getGroupReport(group.getId());
-      for (Balance balance : report.getBalances()) {
-        if (!(balance.getBalance().compareTo(BigDecimal.ZERO) == 0)) {
-          return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
-        }
+    Pair<String, User> validateDeletedUser = userService.deleteUser(userId);
+    if (validateDeletedUser.getFirst() != null) {
+      String errorMessage = validateDeletedUser.getFirst();
+      if (errorMessage.equals("NoSuchUserExists")) {
+        return ResponseEntity.notFound().build();
+      } else if (errorMessage.equals("UserHasDebt")) {
+        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build();
       }
     }
 
-    // Remove user from all groups
-    for (Group group : groups) {
-      List<User> users = group.getUsers();
-      List<User> updatedUsers = new ArrayList<>();
-      for (User user: users) {
-        if (!user.getId().equals(userId)) {
-          updatedUsers.add(user);
-        }
-      }
-      group.setUsers(updatedUsers);
-      groupRepository.save(group);
-    }
-
-    // Delete user entity
-    return userRepository.findById(userId)
-        .map(user -> {
-          userRepository.delete(user);
-          return ResponseEntity.ok().build();
-        }).orElse(
-            ResponseEntity.notFound().build()
-        );
+    return ResponseEntity.ok().build();
   }
 
   /**
@@ -151,45 +109,23 @@ public class UsersApi {
   @PutMapping(value = "/users/{userId}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
   @PreAuthorize("@securityService.userIsSameUser(principal, #userId)")
   public ResponseEntity<User> updateUser(@PathVariable Long userId, @RequestBody UserDTO userDTO) {
+    Pair<String, User> validateUpdatedUser = userService.updateUser(userId, userDTO);
+    if (validateUpdatedUser.getFirst() != null) {
+      String validationMessage = validateUpdatedUser.getFirst();
 
-    Optional<User> userOptional = userRepository.findById(userId);
-    boolean userEmailChanged = userOptional.isPresent() && !userOptional.get().getEmail().equals(userDTO.getEmail());
-
-    // Check if user wants to change it's current email address and if the new one
-    // is already registered. Return an error status code if it is.
-    if (userEmailChanged && userRepository.findByEmail(userDTO.getEmail()) != null) {
-      return new ResponseEntity<>(userOptional.get(), HttpStatus.PRECONDITION_FAILED);
-    }
-
-    // Allow account changes only when user enters his password correctly
-    if (userOptional.isPresent() && passwordEncoder.matches(userDTO.getPassword(), userOptional.get().getPassword())) {
-      // Resend a verification mail to user if the email address has been changed.
-      String emailVerificationCode = UUID.randomUUID().toString();
-      if (userEmailChanged) {
-        Map<String, Object> templateModel = new HashMap<>();
-        templateModel.put("username", userDTO.getUsername());
-        templateModel.put("verificationLink",
-            PARTIDO_API_BASE + USERS_API_PATH + userOptional.get().getId() + VERIFY_PATH + emailVerificationCode);
-        emailService.sendEmailVerificationMail(userDTO.getEmail(), templateModel);
+      if (validationMessage.equals("UpdatedEmail")) {
+        return new ResponseEntity<>(validateUpdatedUser.getSecond(), HttpStatus.PRECONDITION_FAILED);
       }
-      return new ResponseEntity<>(userOptional.map(user -> {
-        user.setUsername(userDTO.getUsername());
-        user.setEmail(userDTO.getEmail());
-        // If the email address has been changed, change verification details in user's entity
-        if (userEmailChanged) {
-          user.setEmailVerificationCode(emailVerificationCode);
-          user.setEmailVerified(false);
-        }
-        // If a new password has been provided and it is valid, save it
-        if (userDTO.getNewPassword() != null && userDTO.getNewPassword().length() > 6) {
-          user.setPassword(passwordEncoder.encode(userDTO.getNewPassword()));
-        }
-        return userRepository.save(user);
-      }).get(), HttpStatus.OK);
+
+      if (validationMessage.equals("NothingUpdated")) {
+        return new ResponseEntity<>(validateUpdatedUser.getSecond(), HttpStatus.NOT_MODIFIED);
+      }
+
+      if (validationMessage.equals("NothingUpdated")) {
+        return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+      }
     }
 
-    // If nothing has changed, just return the current user if found
-    return userOptional.map(user -> new ResponseEntity<>(user, HttpStatus.NOT_MODIFIED))
-        .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    return new ResponseEntity<>(validateUpdatedUser.getSecond(), HttpStatus.OK);
   }
 }

@@ -7,6 +7,10 @@ This is the backend server application of the Partido platform written in Java w
 
 Partido itself is a platform independent App for sharing group expenses.
 
+## How to contribute to the project
+
+You can contribute in various ways - even if you're not a software developer. You can translate Partido to your language, report bugs, request features or code. Please check the [contribution guidelines](https://github.com/partidodev/partido-server/blob/main/CONTRIBUTING.md) to start.
+
 ## How to run the server
 
 In the project root folder, run:

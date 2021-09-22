@@ -19,7 +19,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-public class Bill implements Comparable {
+public class Bill implements Comparable<Bill> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -177,8 +177,8 @@ public class Bill implements Comparable {
   }
 
   @Override
-  public int compareTo(Object o) {
-    return creationDate.compareTo(((Bill)o).getCreationDate());
+  public int compareTo(Bill bill) {
+    return creationDate.compareTo((bill).getCreationDate());
   }
 }
 

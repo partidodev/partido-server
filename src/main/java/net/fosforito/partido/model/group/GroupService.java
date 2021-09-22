@@ -8,8 +8,6 @@ import net.fosforito.partido.model.report.Balance;
 import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.split.Split;
 import net.fosforito.partido.model.user.User;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -23,8 +21,6 @@ import java.util.List;
 
 @Service
 public class GroupService {
-
-  private static final Logger LOGGER = LoggerFactory.getLogger(GroupService.class);
 
   private final BillRepository billRepository;
   private final GroupRepository groupRepository;

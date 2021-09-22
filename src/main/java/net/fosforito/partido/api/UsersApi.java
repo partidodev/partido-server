@@ -1,7 +1,6 @@
 package net.fosforito.partido.api;
 
 import net.fosforito.partido.mail.EmailService;
-import net.fosforito.partido.model.bill.BillRepository;
 import net.fosforito.partido.model.group.Group;
 import net.fosforito.partido.model.group.GroupRepository;
 import net.fosforito.partido.model.report.Balance;
@@ -34,7 +33,6 @@ public class UsersApi {
   private final EmailService emailService;
   private final GroupsApi groupsApi;
   private final GroupRepository groupRepository;
-  private final BillRepository billRepository;
 
   @Inject
   public UsersApi(UserRepository userRepository,
@@ -42,15 +40,13 @@ public class UsersApi {
                   CurrentUserContext currentUserContext,
                   EmailService emailService,
                   GroupsApi groupsApi,
-                  GroupRepository groupRepository,
-                  BillRepository billRepository) {
+                  GroupRepository groupRepository) {
     this.userRepository = userRepository;
     this.passwordEncoder = passwordEncoder;
     this.currentUserContext = currentUserContext;
     this.emailService = emailService;
     this.groupsApi = groupsApi;
     this.groupRepository = groupRepository;
-    this.billRepository = billRepository;
   }
 
   /**

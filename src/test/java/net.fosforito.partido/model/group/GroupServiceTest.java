@@ -4,12 +4,13 @@ import net.fosforito.partido.model.checkout.CheckoutReport;
 import net.fosforito.partido.model.report.Balance;
 import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.user.User;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -17,7 +18,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class GroupServiceTest {
 
   @Mock
@@ -42,19 +43,19 @@ public class GroupServiceTest {
 
     CheckoutReport checkoutReport = groupService.checkoutGroup(1L);
 
-    Assert.assertEquals(3, checkoutReport.getCompensationPayments().size());
+    Assertions.assertEquals(3, checkoutReport.getCompensationPayments().size());
 
-    Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
-    Assert.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
-    Assert.assertEquals(BigDecimal.valueOf(150), checkoutReport.getCompensationPayments().get(0).getAmount());
+    Assertions.assertEquals("D", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
+    Assertions.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
+    Assertions.assertEquals(BigDecimal.valueOf(150), checkoutReport.getCompensationPayments().get(0).getAmount());
 
-    Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(1).getFromUser().getUsername());
-    Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(1).getToUser().getUsername());
-    Assert.assertEquals(BigDecimal.valueOf(10), checkoutReport.getCompensationPayments().get(1).getAmount());
+    Assertions.assertEquals("D", checkoutReport.getCompensationPayments().get(1).getFromUser().getUsername());
+    Assertions.assertEquals("B", checkoutReport.getCompensationPayments().get(1).getToUser().getUsername());
+    Assertions.assertEquals(BigDecimal.valueOf(10), checkoutReport.getCompensationPayments().get(1).getAmount());
 
-    Assert.assertEquals("C", checkoutReport.getCompensationPayments().get(2).getFromUser().getUsername());
-    Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(2).getToUser().getUsername());
-    Assert.assertEquals(BigDecimal.valueOf(40), checkoutReport.getCompensationPayments().get(2).getAmount());
+    Assertions.assertEquals("C", checkoutReport.getCompensationPayments().get(2).getFromUser().getUsername());
+    Assertions.assertEquals("B", checkoutReport.getCompensationPayments().get(2).getToUser().getUsername());
+    Assertions.assertEquals(BigDecimal.valueOf(40), checkoutReport.getCompensationPayments().get(2).getAmount());
   }
 
   @Test
@@ -78,23 +79,23 @@ public class GroupServiceTest {
 
     CheckoutReport checkoutReport = groupService.checkoutGroup(1L);
 
-    Assert.assertEquals(4, checkoutReport.getCompensationPayments().size());
+    Assertions.assertEquals(4, checkoutReport.getCompensationPayments().size());
 
-    Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
-    Assert.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
-    Assert.assertEquals(BigDecimal.valueOf(154.99), checkoutReport.getCompensationPayments().get(0).getAmount());
+    Assertions.assertEquals("D", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
+    Assertions.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
+    Assertions.assertEquals(BigDecimal.valueOf(154.99), checkoutReport.getCompensationPayments().get(0).getAmount());
 
-    Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(1).getFromUser().getUsername());
-    Assert.assertEquals("C", checkoutReport.getCompensationPayments().get(1).getToUser().getUsername());
-    Assert.assertEquals(BigDecimal.valueOf(78.11), checkoutReport.getCompensationPayments().get(1).getAmount());
+    Assertions.assertEquals("D", checkoutReport.getCompensationPayments().get(1).getFromUser().getUsername());
+    Assertions.assertEquals("C", checkoutReport.getCompensationPayments().get(1).getToUser().getUsername());
+    Assertions.assertEquals(BigDecimal.valueOf(78.11), checkoutReport.getCompensationPayments().get(1).getAmount());
 
-    Assert.assertEquals("D", checkoutReport.getCompensationPayments().get(2).getFromUser().getUsername());
-    Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(2).getToUser().getUsername());
-    Assert.assertEquals(BigDecimal.valueOf(37.53), checkoutReport.getCompensationPayments().get(2).getAmount());
+    Assertions.assertEquals("D", checkoutReport.getCompensationPayments().get(2).getFromUser().getUsername());
+    Assertions.assertEquals("B", checkoutReport.getCompensationPayments().get(2).getToUser().getUsername());
+    Assertions.assertEquals(BigDecimal.valueOf(37.53), checkoutReport.getCompensationPayments().get(2).getAmount());
 
-    Assert.assertEquals("E", checkoutReport.getCompensationPayments().get(3).getFromUser().getUsername());
-    Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(3).getToUser().getUsername());
-    Assert.assertEquals(BigDecimal.ONE, checkoutReport.getCompensationPayments().get(3).getAmount());
+    Assertions.assertEquals("E", checkoutReport.getCompensationPayments().get(3).getFromUser().getUsername());
+    Assertions.assertEquals("B", checkoutReport.getCompensationPayments().get(3).getToUser().getUsername());
+    Assertions.assertEquals(BigDecimal.ONE, checkoutReport.getCompensationPayments().get(3).getAmount());
   }
 
   @Test
@@ -112,10 +113,9 @@ public class GroupServiceTest {
 
     CheckoutReport checkoutReport = groupService.checkoutGroup(1L);
 
-    Assert.assertEquals(1, checkoutReport.getCompensationPayments().size());
-
-    Assert.assertEquals("B", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
-    Assert.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
-    Assert.assertEquals(BigDecimal.valueOf(150), checkoutReport.getCompensationPayments().get(0).getAmount());
+    Assertions.assertEquals(1, checkoutReport.getCompensationPayments().size());
+    Assertions.assertEquals("B", checkoutReport.getCompensationPayments().get(0).getFromUser().getUsername());
+    Assertions.assertEquals("A", checkoutReport.getCompensationPayments().get(0).getToUser().getUsername());
+    Assertions.assertEquals(BigDecimal.valueOf(150), checkoutReport.getCompensationPayments().get(0).getAmount());
   }
 }

@@ -28,9 +28,11 @@ hs_err_pid*
 .idea/
 *.iml
 
-# Others
-.openapi-generator-ignore
-.openapi-generator/
+# Eclipse
 .classpath
 .project
 .settings/
+
+# Others
+.openapi-generator-ignore
+.openapi-generator/

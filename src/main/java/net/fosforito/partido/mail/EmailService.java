@@ -57,7 +57,7 @@ public class EmailService {
       helper.addAttachment("Attachment", file);
       emailSender.send(message);
     } catch (MessagingException e) {
-      e.printStackTrace();
+      LOGGER.error("Failed to send mail to user {}", to, e);
     }
   }
 

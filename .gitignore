@@ -31,3 +31,6 @@ hs_err_pid*
 # Others
 .openapi-generator-ignore
 .openapi-generator/
+.classpath
+.project
+.settings/

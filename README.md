@@ -36,7 +36,7 @@ The defaults defined in `./src/main/resources/application.properties` are:
 
 ```
 ## Spring DATASOURCE (DataSourceAutoConfiguration & DataSourceProperties)
-spring.datasource.url=jdbc:postgresql://localhost:5432/partido-server
+spring.datasource.url=jdbc:postgresql://localhost:5433/partido
 spring.datasource.username=postgres
 spring.datasource.password=postgres
 ```

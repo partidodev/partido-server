@@ -12,13 +12,16 @@ You can contribute in various ways - even if you're not a software developer. Yo
 
 ## How to run the server
 
-In the project root folder, run:
+To create the postgres container, go into the project root folder and run:
+```bash
+docker-compose -f src/main/postgres.yml up -d
+```
 
+In the same directory, run:
 ```
 mvn spring-boot:run
 ```
-
-or just press the IDE's run button.
+To start the spring application, or just press the IDE's run button.
 
 The server will listen on Port 8080 per default (defined in `./src/main/resources/application.properties`).
 

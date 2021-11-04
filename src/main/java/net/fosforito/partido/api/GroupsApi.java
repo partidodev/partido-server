@@ -2,6 +2,7 @@ package net.fosforito.partido.api;
 
 import net.fosforito.partido.mail.EmailService;
 import net.fosforito.partido.model.checkout.CheckoutReport;
+import net.fosforito.partido.model.checkout.CompensationPayment;
 import net.fosforito.partido.model.group.*;
 import net.fosforito.partido.model.report.Balance;
 import net.fosforito.partido.model.report.Report;
@@ -20,9 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -229,7 +232,7 @@ public class GroupsApi {
   @GetMapping(value = "/groups/{groupId}/report")
   @PreAuthorize("@securityService.userCanReadGroup(principal, #groupId)")
   public Report getGroupReport(@PathVariable Long groupId) {
-    return groupService.createActualGroupReport(groupId, false);
+    return groupService.createActualGroupReport(groupId);
   }
 
   @PostMapping(value = "/groups/{groupId}/checkout")
@@ -238,7 +241,15 @@ public class GroupsApi {
     CheckoutReport checkoutReport = groupService.checkoutGroup(groupId);
     if (checkoutReport == null) {
       // If checkout report is null, checkout report cannot be made due to zero balances
-      return new ResponseEntity<>(null, HttpStatus.PRECONDITION_FAILED);
+      // Return a dummy CheckoutReport with HTTP Status 412 - "Precondition failed"
+      List<CompensationPayment> dummyCompensationPayments = new LinkedList<>();
+      dummyCompensationPayments.add(new CompensationPayment(
+        currentUserContext.getCurrentUser(),
+        currentUserContext.getCurrentUser(),
+        BigDecimal.ZERO
+      ));
+      CheckoutReport dummyCheckoutReport = new CheckoutReport(LocalDateTime.now(), dummyCompensationPayments);
+      return new ResponseEntity<>(dummyCheckoutReport, HttpStatus.PRECONDITION_FAILED);
     }
     Group group = groupRepository.findById(groupId).get();
     Map<String, Object> templateModel = new HashMap<>();

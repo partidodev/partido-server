@@ -37,19 +37,11 @@ public class GroupService {
    * Open bills can be closed if the corresponding parameter is set to true. This is needed
    * for group checkout processes.
    * @param groupId ID of the group to get balances for
-   * @param closeOpenBills close currently open bills or not
    * @return Report with balances
    */
-  public Report createActualGroupReport(Long groupId, boolean closeOpenBills) {
+  public Report createActualGroupReport(Long groupId) {
     List<Bill> bills = billRepository.findAllByGroupIdAndClosed(groupId, false);
     List<User> users = groupRepository.findById(groupId).get().getUsers();
-
-    if (closeOpenBills) {
-      for (Bill bill : bills) {
-        bill.setClosed(true);
-        billRepository.save(bill);
-      }
-    }
 
     List<Balance> balances = new ArrayList<>();
 
@@ -74,13 +66,25 @@ public class GroupService {
   }
 
   /**
+   * Used to close all open bills in a group after a checkout.
+   * @param groupId Id of the group which bills should be closed
+   */
+  public void closeOpenBills(Long groupId) {
+    List<Bill> bills = billRepository.findAllByGroupIdAndClosed(groupId, false);
+      for (Bill bill : bills) {
+        bill.setClosed(true);
+        billRepository.save(bill);
+      }
+    }
+
+  /**
    * Checkout a specific group, close all current bills of the group and notify all group members
    * about the checkout with tips on how to compensate all balances.
    * @param groupId ID of the group to check out
    * @return Report with checkout and compensation payment information
    */
   public CheckoutReport checkoutGroup(Long groupId) {
-    List<Balance> currentGroupBalances = createActualGroupReport(groupId, true).getBalances();
+    List<Balance> currentGroupBalances = createActualGroupReport(groupId).getBalances();
     List<Balance> positiveBalances = new LinkedList<>();
     List<Balance> negativeBalances = new LinkedList<>();
     List<CompensationPayment> compensationPayments = new LinkedList<>();
@@ -139,6 +143,10 @@ public class GroupService {
         }
       } while (negativeBalanceRest.compareTo(BigDecimal.ZERO) != 0);
     }
+
+    // Finally close all open bills that where taken
+    // into consideration by this checkout
+    closeOpenBills(groupId);
 
     return new CheckoutReport(LocalDateTime.now(), compensationPayments);
   }

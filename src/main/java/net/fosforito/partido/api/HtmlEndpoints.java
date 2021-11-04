@@ -87,6 +87,7 @@ public class HtmlEndpoints {
     String title;
     String message;
     if (userOptional.isPresent()
+        && userOptional.get().getResetPasswordCode() != null
         && userOptional.get().getResetPasswordCode().length() > 1
         && userOptional.get().getResetPasswordCode().equals(resetPasswordCode)) {
       

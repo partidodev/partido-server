@@ -24,6 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
   private static final Logger LOGGER = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
   public static final String TOO_MANY_FAILED_LOGIN_ATTEMPTS = "Too many failed login attempts. Blocked for 5 minutes.";
   public static final String ACCOUNT_NOT_VERIFIED = "This account has not been verified yet.";
+  public static final String ACCOUNT_NOT_FOUND = "Login details invalid. Please try again.";
 
   private final UserRepository userRepository;
   private final LoginAttemptService loginAttemptService;
@@ -50,6 +51,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     User user = userRepository.findByEmail(email);
+
+    if(user == null) {
+      LOGGER.warn("User {} does not exist (anymore), need new login data", email);
+      throw new RuntimeException(ACCOUNT_NOT_FOUND);
+    }
 
     if (!user.isEmailVerified()) {
       LOGGER.warn("Account {} has not been verified, login attempt cancelled", ip);

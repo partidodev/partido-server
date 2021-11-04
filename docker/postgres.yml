@@ -10,6 +10,6 @@ services:
       POSTGRES_HOST_AUTH_METHOD: trust
       POSTGRES_DB: "partido"
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - ~/volumes/partido/postgresql/:/var/lib/postgresql/data/

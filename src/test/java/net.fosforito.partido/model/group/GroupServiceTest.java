@@ -1,6 +1,7 @@
 package net.fosforito.partido.model.group;
 
 import net.fosforito.partido.model.checkout.CheckoutReport;
+import net.fosforito.partido.model.group.GroupService;
 import net.fosforito.partido.model.report.Balance;
 import net.fosforito.partido.model.report.Report;
 import net.fosforito.partido.model.user.User;
@@ -37,7 +38,7 @@ public class GroupServiceTest {
     currentGroupBalances.add(new Balance(userC, BigDecimal.valueOf(-40)));
     currentGroupBalances.add(new Balance(userD, BigDecimal.valueOf(-160)));
 
-    Mockito.when(groupService.createActualGroupReport(1L, true))
+    Mockito.when(groupService.createActualGroupReport(1L))
         .thenReturn(new Report(LocalDateTime.now(), currentGroupBalances));
     Mockito.when(groupService.checkoutGroup(1L)).thenCallRealMethod();
 
@@ -73,7 +74,7 @@ public class GroupServiceTest {
     currentGroupBalances.add(new Balance(userD, BigDecimal.valueOf(-270.63)));
     currentGroupBalances.add(new Balance(userE, BigDecimal.valueOf(-1)));
 
-    Mockito.when(groupService.createActualGroupReport(1L, true))
+    Mockito.when(groupService.createActualGroupReport(1L))
         .thenReturn(new Report(LocalDateTime.now(), currentGroupBalances));
     Mockito.when(groupService.checkoutGroup(1L)).thenCallRealMethod();
 
@@ -107,7 +108,7 @@ public class GroupServiceTest {
     currentGroupBalances.add(new Balance(userA, BigDecimal.valueOf(150)));
     currentGroupBalances.add(new Balance(userB, BigDecimal.valueOf(-150)));
 
-    Mockito.when(groupService.createActualGroupReport(1L, true))
+    Mockito.when(groupService.createActualGroupReport(1L))
         .thenReturn(new Report(LocalDateTime.now(), currentGroupBalances));
     Mockito.when(groupService.checkoutGroup(1L)).thenCallRealMethod();
 

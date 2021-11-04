@@ -64,7 +64,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public void configure(WebSecurity web) {
     web.ignoring()
       .antMatchers("/users/*/verify/*")
-      .antMatchers("/users/*/reset-password");
+      .antMatchers("/users/*/reset-password")
+      .antMatchers("/users/*/reset-password/*");
   }
 
   @Bean

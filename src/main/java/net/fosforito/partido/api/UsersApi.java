@@ -32,6 +32,7 @@ public class UsersApi {
   public static final String PARTIDO_API_BASE = "https://partido.rocks/api/";
   public static final String USERS_API_PATH = "users/";
   public static final String VERIFY_PATH = "/verify/";
+  public static final String RESET_PASSWORD_PATH = "/reset-password/";
 
   private final UserRepository userRepository;
   private final PasswordEncoder passwordEncoder;
@@ -92,6 +93,30 @@ public class UsersApi {
         PARTIDO_API_BASE + USERS_API_PATH + savedUser.getId() + VERIFY_PATH + emailVerificationCode);
     emailService.sendEmailVerificationMail(userDTO.getEmail(), templateModel);
     return new ResponseEntity<>(savedUser, HttpStatus.OK);
+  }
+
+  /**
+   * Reuest a reset password link that is mailed to the user if the user exists.
+   * The returned response is always "ok" to avoid attackers to be informed
+   * about who is registered on Partido or not.
+   * 
+   * @param emailAddress email of the user which password should be reset
+   * @return HTTP Status 200 "OK"
+   */
+  @PostMapping(value = {"/users/{emailAddress}"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
+  public ResponseEntity<?> requestResetPasswordMail(@PathVariable String emailAddress) {
+    User user = userRepository.findByEmail(emailAddress);
+    if (user != null) {
+      String resetPasswordCode = UUID.randomUUID().toString();
+      user.setResetPasswordCode(resetPasswordCode);
+      userRepository.save(user);
+      Map<String, Object> templateModel = new HashMap<>();
+      templateModel.put("username", user.getUsername());
+      templateModel.put("resetPasswordLink",
+          PARTIDO_API_BASE + USERS_API_PATH + user.getId() + RESET_PASSWORD_PATH + resetPasswordCode);
+      emailService.sendResetPasswordMail(user.getEmail(), templateModel);
+    }
+    return ResponseEntity.ok().build();
   }
 
   /**

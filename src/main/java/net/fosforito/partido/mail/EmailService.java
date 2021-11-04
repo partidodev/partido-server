@@ -74,6 +74,30 @@ public class EmailService {
   }
 
   @Async
+  public void sendResetPasswordMail(String to, Map<String, Object> templateModel) {
+    Context thymeleafContext = new Context();
+    thymeleafContext.setVariables(templateModel);
+    String htmlBody = thymeleafTemplateEngine.process("reset-password-mail.html", thymeleafContext);
+    try {
+      sendHtmlMessage(to, "Partido | Password reset requested", htmlBody);
+    } catch (MessagingException e) {
+      LOGGER.error("Failed to send password reset mail to user {}", to, e);
+    }
+  }
+
+  @Async
+  public void sendNewPasswordMail(String to, Map<String, Object> templateModel) {
+    Context thymeleafContext = new Context();
+    thymeleafContext.setVariables(templateModel);
+    String htmlBody = thymeleafTemplateEngine.process("new-password-mail.html", thymeleafContext);
+    try {
+      sendHtmlMessage(to, "Partido | New password", htmlBody);
+    } catch (MessagingException e) {
+      LOGGER.error("Failed to send password reset mail to user {}", to, e);
+    }
+  }
+
+  @Async
   public void sendGroupCheckoutMail(Group group, Map<String, Object> templateModel) {
     Context thymeleafContext;
     for (User user : group.getUsers()) {

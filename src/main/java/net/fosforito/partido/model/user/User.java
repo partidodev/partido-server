@@ -40,6 +40,9 @@ public class User {
   @JsonIgnore
   private String emailVerificationCode;
 
+  @JsonIgnore
+  private String resetPasswordCode;
+
   @ManyToMany
   @JsonIgnore
   private Set<Role> roles;
@@ -110,6 +113,14 @@ public class User {
 
   public void setEmailVerificationCode(String emailVerificationCode) {
     this.emailVerificationCode = emailVerificationCode;
+  }
+
+  public String getResetPasswordCode() {
+    return resetPasswordCode;
+  }
+
+  public void setResetPasswordCode(String resetPasswordCode) {
+    this.resetPasswordCode= resetPasswordCode;
   }
 
   public Set<Role> getRoles() {

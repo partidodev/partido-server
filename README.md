@@ -49,7 +49,7 @@ You can override these properties with custom start parameters.
 To create a postgres container, you can go into the project root folder and run:
 
 ```
-docker-compose -f src/main/postgres.yml up -d
+docker-compose -f ./docker/postgres.yml up -d
 ```
 
 ## Mail sending on local machine

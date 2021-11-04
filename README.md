@@ -12,16 +12,12 @@ You can contribute in various ways - even if you're not a software developer. Yo
 
 ## How to run the server
 
-To create the postgres container, go into the project root folder and run:
-```bash
-docker-compose -f src/main/postgres.yml up -d
-```
+Go into the project root folder and run
 
-In the same directory, run:
 ```
 mvn spring-boot:run
 ```
-To start the spring application, or just press the IDE's run button.
+to start the spring application, or just press the IDE's run button.
 
 The server will listen on Port 8080 per default (defined in `./src/main/resources/application.properties`).
 
@@ -33,7 +29,9 @@ _OpenAPI Spec of the server is on the To Do List..._
 
 ## Database
 
-The server needs an already existing PostgreSQL database.
+The server needs an already existing PostgreSQL database. 
+
+If you want to run PostgreSQL with Docker, see the next sub-section.
 
 The defaults defined in `./src/main/resources/application.properties` are:
 
@@ -45,6 +43,14 @@ spring.datasource.password=postgres
 ```
 
 You can override these properties with custom start parameters.
+
+### Run PostgreSQL in a Docker container
+
+To create a postgres container, you can go into the project root folder and run:
+
+```
+docker-compose -f src/main/postgres.yml up -d
+```
 
 ## Mail sending on local machine
 

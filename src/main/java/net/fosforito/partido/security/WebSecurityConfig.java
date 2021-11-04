@@ -62,7 +62,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(WebSecurity web) {
-    web.ignoring().antMatchers("/users/*/verify/*");
+    web.ignoring()
+      .antMatchers("/users/*/verify/*")
+      .antMatchers("/users/*/reset-password");
   }
 
   @Bean

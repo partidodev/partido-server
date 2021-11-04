@@ -103,7 +103,7 @@ public class UsersApi {
    * @param emailAddress email of the user which password should be reset
    * @return HTTP Status 200 "OK"
    */
-  @PostMapping(value = {"/users/{emailAddress}"}, produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
+  @GetMapping(value = {"/users/{emailAddress}/reset-password"})
   public ResponseEntity<?> requestResetPasswordMail(@PathVariable String emailAddress) {
     User user = userRepository.findByEmail(emailAddress);
     if (user != null) {

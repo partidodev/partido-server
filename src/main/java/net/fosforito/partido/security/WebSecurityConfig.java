@@ -1,6 +1,8 @@
 package net.fosforito.partido.security;
 
 import net.fosforito.partido.model.user.UserDetailsServiceImpl;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +25,9 @@ import java.util.Arrays;
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+  @Value("${partido.remember_me_token_generation_key}")
+  private String rememberMeTokenGenerationKey;
 
   private final UserDetailsServiceImpl userDetailsService;
   private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
@@ -53,10 +58,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .csrf().disable()
         .authorizeRequests()
         .antMatchers("/users").permitAll()
+        .antMatchers("/actuator/health").permitAll()
         .anyRequest().authenticated()
         .and()
         .rememberMe()
-        .key("o#3vt9§q384tnzv%79384tz78t3*q7z983z&4894=)zvt783tt8&v") // secret for token generation
+        .key(rememberMeTokenGenerationKey) // secret for token generation
         .tokenValiditySeconds(31536000); // 1 year
   }
 

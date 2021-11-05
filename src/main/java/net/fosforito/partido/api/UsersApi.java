@@ -9,6 +9,8 @@ import net.fosforito.partido.model.user.CurrentUserContext;
 import net.fosforito.partido.model.user.User;
 import net.fosforito.partido.model.user.UserDTO;
 import net.fosforito.partido.model.user.UserRepository;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +31,9 @@ import java.util.UUID;
 @RestController
 public class UsersApi {
 
-  public static final String PARTIDO_API_BASE = "https://partido.rocks/api/";
+  @Value("${partido.api_base}")
+  public String partidoApiBase;
+
   public static final String USERS_API_PATH = "users/";
   public static final String VERIFY_PATH = "/verify/";
   public static final String RESET_PASSWORD_PATH = "/reset-password/";
@@ -90,7 +94,7 @@ public class UsersApi {
     Map<String, Object> templateModel = new HashMap<>();
     templateModel.put("username", userDTO.getUsername());
     templateModel.put("verificationLink",
-        PARTIDO_API_BASE + USERS_API_PATH + savedUser.getId() + VERIFY_PATH + emailVerificationCode);
+        partidoApiBase + USERS_API_PATH + savedUser.getId() + VERIFY_PATH + emailVerificationCode);
     emailService.sendEmailVerificationMail(userDTO.getEmail(), templateModel);
     return new ResponseEntity<>(savedUser, HttpStatus.OK);
   }
@@ -113,7 +117,7 @@ public class UsersApi {
       Map<String, Object> templateModel = new HashMap<>();
       templateModel.put("username", user.getUsername());
       templateModel.put("resetPasswordLink",
-          PARTIDO_API_BASE + USERS_API_PATH + user.getId() + RESET_PASSWORD_PATH + resetPasswordCode);
+          partidoApiBase + USERS_API_PATH + user.getId() + RESET_PASSWORD_PATH + resetPasswordCode);
       emailService.sendResetPasswordMail(user.getEmail(), templateModel);
     }
     return ResponseEntity.ok().build();
@@ -196,7 +200,7 @@ public class UsersApi {
         Map<String, Object> templateModel = new HashMap<>();
         templateModel.put("username", userDTO.getUsername());
         templateModel.put("verificationLink",
-            PARTIDO_API_BASE + USERS_API_PATH + userOptional.get().getId() + VERIFY_PATH + emailVerificationCode);
+            partidoApiBase + USERS_API_PATH + userOptional.get().getId() + VERIFY_PATH + emailVerificationCode);
         emailService.sendEmailVerificationMail(userDTO.getEmail(), templateModel);
       }
       return new ResponseEntity<>(userOptional.map(user -> {

@@ -24,7 +24,7 @@ import java.util.Map;
 public class EmailService {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(EmailService.class);
-  private static final String DEFAULT_SENDER_ADDRESS = "no-reply@partido.rocks";
+  private static final String DEFAULT_SENDER_ADDRESS = "Partido <no-reply@partido.rocks>";
   private final JavaMailSender emailSender;
   private final SpringTemplateEngine thymeleafTemplateEngine;
 
